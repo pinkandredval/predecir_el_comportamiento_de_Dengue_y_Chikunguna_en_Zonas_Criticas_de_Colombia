@@ -1,12 +1,27 @@
+# R session files
 .Rproj.user
 .Rhistory
 .RData
 .Ruserdata
+
+# renv
 renv/library/
 renv/staging/
 renv/python/
+renv/local/
+renv/cellar/
+
+# Datos crudos
 data/raw/**/*.csv
 data/raw/**/*.xlsx
 data/raw/**/*.zip
-output/*.html
+
+# Datos procesados (pesados, se regeneran)
+data/processed/
+*.rds
+
+# Outputs
+output/
+
+# Logs
 *.log
