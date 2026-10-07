@@ -124,90 +124,200 @@ print(chikungunya %>% tabyl(sexo, pac_hos))
 # 6. GRÁFICOS
 # ============================================================
 
-# --- 6.1 Histograma de edad (facetado por evento) ---
-ggplot(datos_comp, aes(x = edad, fill = evento)) +
-  geom_histogram(bins = 40, alpha = 0.7) +
-  facet_wrap(~ evento, scales = "free_y") +
-  scale_y_continuous(labels = comma) +
-  labs(title = "Distribución de edad por evento",
-       x = "Edad", y = "Frecuencia") +
-  theme_minimal() +
-  theme(legend.position = "none")
+# --- Paletas por evento (distintos tonos en cada gráfico) ---
+# Dengue: tonos azules
+# Chikungunya: tonos rojo-naranja
 
-# --- 6.2 Boxplot edad × sexo (por evento) ---
+# --- 6.1 Distribución de edad por barras con etiquetas ---
+datos_comp <- datos_comp %>%
+  mutate(grupo_edad = cut(edad,
+                          breaks = seq(0, 125, by = 5),
+                          right = FALSE,
+                          labels = paste0(seq(0, 120, by = 5), "-",
+                                          seq(4, 124, by = 5))))
+
+edad_barras <- datos_comp %>%
+  count(evento, grupo_edad) %>%
+  group_by(evento) %>%
+  mutate(pct = round(n / sum(n) * 100, 1)) %>%
+  ungroup()
+
+ggplot(edad_barras, aes(x = grupo_edad, y = pct, fill = evento)) +
+  geom_col(alpha = 0.9) +
+  geom_text(aes(label = ifelse(pct >= 2, paste0(pct, "%"), "")),
+            vjust = -0.3, size = 2.8) +
+  facet_wrap(~ evento, scales = "free_y", ncol = 1) +
+  scale_fill_manual(values = c("Dengue" = "#08519C",
+                               "Chikungunya" = "#A50F15")) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.12))) +
+  labs(
+    title = "Distribución porcentual por grupos de edad",
+    x     = "Grupo de edad (años)",
+    y     = "% de casos"
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 7)
+  )
+
+# --- 6.2 Boxplot edad × sexo por evento ---
 ggplot(datos_comp, aes(x = sexo, y = edad, fill = sexo)) +
-  geom_boxplot() +
+  geom_boxplot(alpha = 0.85, outlier.size = 0.5, outlier.alpha = 0.4) +
   facet_wrap(~ evento, scales = "free_y") +
-  labs(title = "Edad por sexo y evento",
-       x = "Sexo", y = "Edad") +
-  theme_minimal() +
+  scale_fill_manual(values = c("F" = "#74A9CF", "M" = "#0570B0")) +
+  labs(
+    title = "Edad por sexo y evento",
+    x     = "Sexo (F = Femenino, M = Masculino)",
+    y     = "Edad (años)"
+  ) +
+  theme_minimal(base_size = 12) +
   theme(legend.position = "none")
 
-# --- 6.3 Barras: tipo de caso (por evento, escala libre) ---
+# --- 6.3 Tipo de caso (barras con % y colores distintos por evento) ---
 datos_comp %>%
   count(evento, tip_cas) %>%
-  ggplot(aes(x = tip_cas, y = n, fill = evento)) +
-  geom_col() +
+  group_by(evento) %>%
+  mutate(pct = round(n / sum(n) * 100, 1)) %>%
+  ungroup() %>%
+  ggplot(aes(x = factor(tip_cas), y = pct, fill = evento)) +
+  geom_col(alpha = 0.9) +
+  geom_text(aes(label = paste0(pct, "%")), vjust = -0.3, size = 3.5) +
   facet_wrap(~ evento, scales = "free_y") +
-  scale_y_continuous(labels = comma) +
-  labs(title = "Tipo de caso por evento",
-       x = "Código", y = "Casos") +
-  theme_minimal() +
+  scale_fill_manual(values = c("Dengue" = "#3182BD",
+                               "Chikungunya" = "#E6550D")) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.15))) +
+  labs(
+    title    = "Tipo de caso por evento",
+    subtitle = "Códigos: 1=Sospechoso | 2=Conf. clínica | 3=Conf. lab | 4=Conf. clínica | 5=Otro",
+    x        = "Código de tipo de caso",
+    y        = "% de casos"
+  ) +
+  theme_minimal(base_size = 12) +
   theme(legend.position = "none")
 
-# --- 6.4 Barras: sexo (por evento, escala libre) ---
+# --- 6.4 Sexo (barras con % y colores propios) ---
 datos_comp %>%
   count(evento, sexo) %>%
-  ggplot(aes(x = sexo, y = n, fill = evento)) +
-  geom_col() +
+  group_by(evento) %>%
+  mutate(pct = round(n / sum(n) * 100, 1)) %>%
+  ungroup() %>%
+  ggplot(aes(x = sexo, y = pct, fill = evento)) +
+  geom_col(alpha = 0.9) +
+  geom_text(aes(label = paste0(pct, "%")), vjust = -0.3, size = 4) +
   facet_wrap(~ evento, scales = "free_y") +
-  scale_y_continuous(labels = comma) +
-  labs(title = "Distribución por sexo",
-       x = "Sexo", y = "Casos") +
-  theme_minimal() +
+  scale_fill_manual(values = c("Dengue" = "#6BAED6",
+                               "Chikungunya" = "#FD8D3C")) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.15))) +
+  labs(
+    title = "Distribución porcentual por sexo",
+    x     = "Sexo",
+    y     = "% de casos"
+  ) +
+  theme_minimal(base_size = 12) +
   theme(legend.position = "none")
 
-# --- 6.5 Barras: hospitalización (por evento, escala libre) ---
+# --- 6.5 Hospitalización (barras con % y colores propios) ---
 datos_comp %>%
   count(evento, pac_hos) %>%
-  ggplot(aes(x = pac_hos, y = n, fill = evento)) +
-  geom_col() +
+  group_by(evento) %>%
+  mutate(pct = round(n / sum(n) * 100, 1)) %>%
+  ungroup() %>%
+  ggplot(aes(x = pac_hos, y = pct, fill = evento)) +
+  geom_col(alpha = 0.9) +
+  geom_text(aes(label = paste0(pct, "%")), vjust = -0.3, size = 4) +
   facet_wrap(~ evento, scales = "free_y") +
-  scale_y_continuous(labels = comma) +
-  labs(title = "Hospitalización por evento",
-       x = "1 = Sí, 2 = No", y = "Casos") +
-  theme_minimal() +
+  scale_fill_manual(values = c("Dengue" = "#4292C6",
+                               "Chikungunya" = "#E31A1C")) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.15))) +
+  labs(
+    title = "Hospitalización por evento",
+    x     = "¿Estuvo hospitalizado? (1 = Sí, 2 = No)",
+    y     = "% de casos"
+  ) +
+  theme_minimal(base_size = 12) +
   theme(legend.position = "none")
 
-# --- 6.6 Serie temporal por semana (facetado por evento y año) ---
-datos_comp %>%
-  count(anio, semana, evento) %>%
-  ggplot(aes(x = semana, y = n, color = evento)) +
-  geom_line(linewidth = 0.7) +
-  facet_grid(evento ~ anio, scales = "free_y") +
-  scale_y_continuous(labels = comma) +
-  labs(title = "Casos por semana epidemiológica, año y evento",
-       x = "Semana", y = "Casos") +
-  theme_minimal() +
-  theme(legend.position = "none")
+# --- 6.6 Serie temporal por semana - Dengue (Escala Logarítmica) ---
+serie_dengue <- datos_comp %>%
+  filter(evento == "Dengue") %>%
+  count(anio, semana)
 
-# --- 6.7 Serie temporal con eje X y Y libres por evento ---
+ggplot(serie_dengue, aes(x = semana, y = n, color = factor(anio))) +
+  geom_line(linewidth = 0.8) +
+  scale_color_manual(
+    values = c("2020" = "#08519C",
+               "2021" = "#2171B5",
+               "2022" = "#4292C6",
+               "2023" = "#6BAED6",
+               "2024" = "#9ECAE1",
+               "2025" = "#C6DBEF"),
+    name = "Año"
+  ) +
+  scale_x_continuous(breaks = seq(0, 52, by = 4)) +
+  scale_y_continuous(trans = "log1p", labels = comma) +
+  labs(
+    title    = "Dengue: casos por semana epidemiológica (2020-2025)",
+    subtitle = "Cada línea representa un año (Escala logarítmica)",
+    x        = "Semana epidemiológica",
+    y        = "Casos (log)"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "right")
+
+# --- 6.6 Serie temporal por semana - Chikungunya (Escala Logarítmica) ---
+serie_chik <- datos_comp %>%
+  filter(evento == "Chikungunya") %>%
+  count(anio, semana)
+
+ggplot(serie_chik, aes(x = semana, y = n, color = factor(anio))) +
+  geom_line(linewidth = 0.8) +
+  scale_color_manual(
+    values = c("2020" = "#A50F15",
+               "2021" = "#CB181D",
+               "2022" = "#EF3B2C",
+               "2023" = "#FB6A4A",
+               "2024" = "#FC9272",
+               "2025" = "#FCBBA1"),
+    name = "Año"
+  ) +
+  scale_x_continuous(breaks = seq(0, 52, by = 4)) +
+  scale_y_continuous(trans = "log1p", labels = comma) +
+  labs(
+    title    = "Chikungunya: casos por semana epidemiológica (2020-2025)",
+    subtitle = "Cada línea representa un año (Escala logarítmica)",
+    x        = "Semana epidemiológica",
+    y        = "Casos (log)"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "right")
+
+# --- 6.7 Serie temporal continua por evento (años en ambos paneles) ---
+colores_evento <- c("Dengue" = "#08519C", "Chikungunya" = "#A50F15")
+rango_fechas <- range(datos_comp$fecha_epi, na.rm = TRUE)
+
 datos_comp %>%
   count(fecha_epi, evento) %>%
   ggplot(aes(x = fecha_epi, y = n, color = evento)) +
   geom_line(linewidth = 0.6) +
   facet_wrap(~ evento, scales = "free", ncol = 1) +
+  scale_color_manual(values = colores_evento) +
   scale_y_continuous(labels = comma) +
-  scale_x_date(date_labels = "%Y", date_breaks = "1 year") +
-  labs(title = "Serie temporal por evento (escala libre)",
-       x = "Fecha", y = "Casos") +
-  theme_minimal() +
+  scale_x_date(
+    limits       = rango_fechas,
+    date_labels  = "%Y",
+    date_breaks  = "1 year"
+  ) +
+  labs(
+    title = "Serie temporal por evento (escala libre)",
+    x     = "Fecha",
+    y     = "Casos"
+  ) +
+  theme_minimal(base_size = 12) +
   theme(
     legend.position = "none",
-    axis.text.x = element_text(angle = 45, hjust = 1),
-    strip.placement = "outside"
+    axis.text.x     = element_text(angle = 45, hjust = 1)
   )
-
 
 # ============================================================
 # 7. ATÍPICOS EN EDAD

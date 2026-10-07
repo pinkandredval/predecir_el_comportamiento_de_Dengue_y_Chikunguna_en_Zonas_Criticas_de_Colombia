@@ -14,11 +14,16 @@ auditar <- function(df, nombre) {
   cat("\n==================================================\n")
   cat("AUDITORÍA:", nombre, "\n")
   cat("==================================================\n")
+  
+  # --- Excluir columnas auxiliares na_estructural_* ---
+  df_analisis <- df %>% select(-starts_with("na_estructural"))
+  
   cat("\nDimensiones:", nrow(df), "filas x", ncol(df), "columnas\n")
+  cat("Columnas de análisis (sin auxiliares):", ncol(df_analisis), "\n")
   
   # --- Tipos ---
   cat("\n--- TIPOS DE COLUMNAS ---\n")
-  df %>%
+  df_analisis %>%
     summarise(across(everything(), ~ class(.)[1])) %>%
     pivot_longer(everything(), names_to = "variable", values_to = "tipo") %>%
     count(tipo) %>%
@@ -26,7 +31,7 @@ auditar <- function(df, nombre) {
   
   # --- 100% vacías ---
   cat("\n--- COLUMNAS 100% VACÍAS ---\n")
-  vacias <- df %>%
+  vacias <- df_analisis %>%
     summarise(across(everything(), ~ all(is.na(.)))) %>%
     pivot_longer(everything(), names_to = "variable", values_to = "vacia") %>%
     filter(vacia) %>% pull(variable)
@@ -34,7 +39,7 @@ auditar <- function(df, nombre) {
   
   # --- Constantes ---
   cat("\n--- COLUMNAS CONSTANTES ---\n")
-  constantes <- df %>%
+  constantes <- df_analisis %>%
     summarise(across(everything(), ~ n_distinct(., na.rm = TRUE))) %>%
     pivot_longer(everything(), names_to = "variable", values_to = "n_unicos") %>%
     filter(n_unicos == 1)
