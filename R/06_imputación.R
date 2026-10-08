@@ -1,10 +1,10 @@
 # ============================================================
-# 06_imputacion.R (Versión final — todo con PMM)
-#   - Dengue      -> mice + method = "pmm"
-#   - Chikungunya -> mice + method = "pmm"
-#   - Numéricas y categóricas (binarias y nominales) con pmm
+# 06_imputacion.R
+# Imputación coherente con el diagnóstico del 05_faltantes.R
+#   - Dengue      -> mice + method = "rf"  (MAR, base grande)
+#   - Chikungunya -> mice + method = "pmm" (MCAR, base chica)
 #   - Respeta NA estructurales (no_aplica) con máscara
-# Librerías: tidyverse, here, janitor, naniar, mice, scales
+# Librerías: tidyverse, here, janitor, naniar, mice, ranger, scales
 # ============================================================
 
 suppressPackageStartupMessages({
@@ -13,6 +13,7 @@ suppressPackageStartupMessages({
   library(janitor)
   library(naniar)
   library(mice)
+  library(ranger)     # requerido por mice cuando method = "rf"
   library(scales)
 })
 
@@ -24,7 +25,7 @@ dir.create(here("data", "imputed"),
            recursive = TRUE, showWarnings = FALSE)
 
 # ============================================================
-# 0. FUNCIONES AUXILIARES
+# 0. FUNCIONES AUXILIARES (reutilizadas del 05)
 # ============================================================
 
 clasificar_celdas <- function(df) {
@@ -49,14 +50,39 @@ clasificar_celdas <- function(df) {
 # ============================================================
 
 vars_excluir <- c(
+  # Identificadores
   "consecutive", "cod_eve", "nombre_evento", "evento",
+  # Fechas de proceso
   "fec_not", "fecha_epi", "ini_sin", "fec_con",
+  # Administrativas / institucionales
   "nombre_upgd", "va_sispro", "fuente", "confirmados",
   "nom_est_f_caso", "estado_final_de_caso",
+  # Geográficas rígidas (códigos)
   "cod_pais_o", "cod_dpto_o", "cod_mun_o",
   "cod_pais_r", "cod_dpto_r", "cod_mun_r",
   "cod_dpto_n", "cod_mun_n",
-  "ano", "anio", "semana"
+  # Temporales
+  "ano", "anio", "semana",
+  
+  # >>> NUEVO: NA estructurales de subpoblación <<<
+  # Militares (solo aplican a personal militar)
+  "fm_fuerza", "fm_unidad", "fm_grado",
+  
+  # Grupos poblacionales específicos
+  "gp_gestan", "sem_ges",           # solo gestantes
+  "gp_discapa", "gp_desplaz",       # solo discapacitados/desplazados
+  "gp_migrant", "gp_carcela",       # solo migrantes/carcelarios
+  "gp_indigen", "gp_pobicfb",       # solo indígenas/afro
+  "gp_mad_com", "gp_desmovi",       # solo madres comunitarias/desmovilizados
+  "gp_psiquia", "gp_vic_vio",       # solo psiquiátricos/víctimas violencia
+  "gp_otros", "gru_pob", "nom_grupo",  # grupo poblacional general
+  
+  # Otras específicas
+  "fec_hos", "fec_def",             # solo hospitalizados/fallecidos
+  "fec_aju", "ajuste",              # solo casos ajustados
+  "fecha_nto",                      # fecha de nacimiento (puede ser específica)
+  "con_fin",                        # condición final (solo fin de caso)
+  "ocupacion"                       # si es muy específica por grupo
 )
 
 seleccionar_vars_imputar <- function(df, vars_excluir) {
@@ -85,6 +111,8 @@ print(as.data.frame(filter(selec_chik, imputar)), row.names = FALSE)
 
 # ============================================================
 # 2. PREPARAR DATA FRAME PARA IMPUTACIÓN
+#    - Convertir caracteres a factor
+#    - Convertir no_aplica -> NA temporal (con máscara)
 # ============================================================
 
 preparar_para_imputar <- function(df, vars_imputar) {
@@ -108,10 +136,12 @@ preparar_para_imputar <- function(df, vars_imputar) {
 }
 
 # ============================================================
-# 3. ASIGNAR MÉTODOS — TODO CON PMM
+# 3. SELECCIÓN AUTOMÁTICA DE MÉTODOS POR TIPO DE VARIABLE
 # ============================================================
 
-asignar_metodos <- function(df_imp) {
+asignar_metodos <- function(df_imp, metodo_principal = c("rf", "pmm")) {
+  
+  metodo_principal <- match.arg(metodo_principal)
   
   metodos <- make.method(df_imp)
   
@@ -121,24 +151,34 @@ asignar_metodos <- function(df_imp) {
   es_entero     <- sapply(df_imp, is.integer)
   es_fecha      <- sapply(df_imp, function(x) inherits(x, "Date") || inherits(x, "POSIXct"))
   
-  # TODO con pmm (numéricas y categóricas)
-  metodos[es_numerica]   <- "pmm"
-  metodos[es_entero]     <- "pmm"
-  metodos[es_binaria]    <- "pmm"
-  metodos[es_categorica] <- "pmm"
+  if (metodo_principal == "rf") {
+    # Random Forest para todo lo que pueda (numéricas y categóricas)
+    metodos[es_numerica]   <- "rf"
+    metodos[es_entero]     <- "rf"
+    metodos[es_categorica] <- "rf"
+    metodos[es_binaria]    <- "rf"
+  } else {
+    # pmm para numéricas, logreg/polyreg para categóricas
+    metodos[es_numerica]   <- "pmm"
+    metodos[es_entero]     <- "pmm"
+    metodos[es_binaria]    <- "logreg"
+    metodos[es_categorica] <- "polyreg"
+  }
   
-  # Fechas no se imputan (mice no maneja bien Date con pmm)
+  # Las fechas o columnas problemáticas -> dejar sin imputar
   if (any(es_fecha)) metodos[es_fecha] <- ""
   
   metodos
 }
 
 # ============================================================
-# 4. FUNCIÓN MAESTRA DE IMPUTACIÓN (todo pmm)
+# 4. FUNCIÓN MAESTRA DE IMPUTACIÓN
 # ============================================================
 
 imputar_evento <- function(df, nombre_evento, vars_imputar,
-                           m = 5, maxit = 5, seed = 123) {
+                           metodo_principal = "pmm",
+                           m = 5, maxit = 5, seed = 123,
+                           ntree = 10) {
   
   if (length(vars_imputar) == 0) {
     message("[skip] ", nombre_evento, ": nada que imputar")
@@ -147,12 +187,15 @@ imputar_evento <- function(df, nombre_evento, vars_imputar,
   
   cat("\n")
   cat("=========================================================\n")
-  cat("IMPUTANDO:", nombre_evento, " (todo con pmm)\n")
+  cat("IMPUTANDO:", nombre_evento, "\n")
   cat("=========================================================\n")
   cat("Variables a imputar:  ", length(vars_imputar), "\n")
-  cat("Método:               pmm\n")
+  cat("Método principal:     ", metodo_principal, "\n")
   cat("m (imputaciones):     ", m, "\n")
   cat("maxit (iteraciones):  ", maxit, "\n")
+  if (metodo_principal == "rf") {
+    cat("ntree (árboles RF):   ", ntree, "\n")
+  }
   cat("=========================================================\n")
   
   # --- Preparar datos ---
@@ -160,25 +203,41 @@ imputar_evento <- function(df, nombre_evento, vars_imputar,
   df_imp <- prep$df_imp
   mask_no_aplica <- prep$mask
   
-  # --- Asignar métodos (todo pmm) ---
-  metodos <- asignar_metodos(df_imp)
+  # --- Asignar métodos ---
+  metodos <- asignar_metodos(df_imp, metodo_principal)
   
   cat("\nMétodos asignados:\n")
   print(table(metodos))
   
-  # --- Ejecutar mice con tiempo medido ---
-  t0 <- Sys.time()
-  imp <- mice(
-    df_imp,
+  # --- Parámetros extra para mice ---
+  args_mice <- list(
+    data      = df_imp,
     m         = m,
     maxit     = maxit,
     method    = metodos,
     seed      = seed,
     printFlag = TRUE
   )
+  
+  if (metodo_principal == "rf") {
+    # Parámetros RF: ntree, etc.
+    args_mice$ntree <- ntree
+    # rf necesita al menos 2 variables predictoras
+    if (ncol(df_imp) < 2) {
+      warning("Se necesitan >=2 variables para RF. Cambiando a pmm.")
+      metodos[metodos == "rf"] <- "pmm"
+      metodos[metodos == ""]   <- ""  # nada
+      args_mice$method <- metodos
+      args_mice$ntree  <- NULL
+    }
+  }
+  
+  # --- Ejecutar mice con tiempo medido ---
+  t0 <- Sys.time()
+  imp <- do.call(mice, args_mice)
   t1 <- Sys.time()
   
-  cat("\nTiempo de imputación:",
+  cat("\nTiempo de ejecución:",
       round(as.numeric(difftime(t1, t0, units = "mins")), 2), "min\n")
   
   # --- Extraer la primera imputación completada ---
@@ -206,6 +265,13 @@ imputar_evento <- function(df, nombre_evento, vars_imputar,
   cat("\n--- Comparación NA antes/después ---\n")
   print(as.data.frame(comparacion), row.names = FALSE)
   
+  # --- Diagnóstico de convergencia ---
+  cat("\n--- Convergencia (primeras 5 variables) ---\n")
+  vars_diag <- head(vars_imputar, 5)
+  tryCatch({
+    print(imp$loggedEvents)
+  }, error = function(e) NULL)
+  
   list(
     imp            = imp,
     df_imputado    = df_imputado,
@@ -220,34 +286,37 @@ imputar_evento <- function(df, nombre_evento, vars_imputar,
 # 5. EJECUTAR IMPUTACIÓN POR EVENTO
 # ============================================================
 
-# --- DENGUE: pmm, m=3, maxit=2 (rápido y suficiente) ---
+# --- DENGUE: rf, MAR, base grande ---
 vars_imp_dengue <- selec_dengue %>% filter(imputar) %>% pull(variable)
 
 cat("\n>>> Dengue: ", length(vars_imp_dengue),
-    "variables a imputar con pmm\n", sep = "")
+    "variables a imputar con rf\n", sep = "")
 
 res_dengue <- imputar_evento(
-  df            = dengue,
-  nombre_evento = "Dengue",
-  vars_imputar  = vars_imp_dengue,
-  m             = 3,
-  maxit         = 2,
-  seed          = 123
+  df               = dengue,
+  nombre_evento    = "Dengue",
+  vars_imputar     = vars_imp_dengue,
+  metodo_principal = "rf",
+  m                = 3,
+  maxit            = 2,
+  ntree            = 5,
+  seed             = 123
 )
 
-# --- CHIKUNGUNYA: pmm, m=5, maxit=5 (base chica, no hay prisa) ---
+# --- CHIKUNGUNYA: pmm, MCAR, base chica ---
 vars_imp_chik <- selec_chik %>% filter(imputar) %>% pull(variable)
 
 cat("\n>>> Chikungunya: ", length(vars_imp_chik),
     "variables a imputar con pmm\n", sep = "")
 
 res_chik <- imputar_evento(
-  df            = chikungunya,
-  nombre_evento = "Chikungunya",
-  vars_imputar  = vars_imp_chik,
-  m             = 5,
-  maxit         = 5,
-  seed          = 123
+  df               = chikungunya,
+  nombre_evento    = "Chikungunya",
+  vars_imputar     = vars_imp_chik,
+  metodo_principal = "pmm",
+  m                = 5,
+  maxit            = 5,
+  seed             = 123
 )
 
 # ============================================================
@@ -258,10 +327,12 @@ reconstruir_df <- function(df_original, df_imputado, vars_imputar) {
   
   df_final <- df_original
   
+  # Reemplazar SOLO las variables imputadas
   for (v in vars_imputar) {
     df_final[[v]] <- df_imputado[[v]]
   }
   
+  # Banderas de imputación (1 si fue faltante real, 0 si no)
   estados_orig <- clasificar_celdas(df_original)
   
   for (v in vars_imputar) {
@@ -281,16 +352,19 @@ chikungunya_final <- reconstruir_df(chikungunya, res_chik$df_imputado,
 # 7. GUARDAR RESULTADOS
 # ============================================================
 
+# Data frames finales (con variables imputadas + banderas)
 saveRDS(dengue_final,
         here("data", "imputed", "dengue_imputado.rds"))
 saveRDS(chikungunya_final,
         here("data", "imputed", "chikungunya_imputado.rds"))
 
+# Objetos mids (por si quieres pooling después)
 saveRDS(res_dengue$imp,
         here("data", "imputed", "dengue_mice_mids.rds"))
 saveRDS(res_chik$imp,
         here("data", "imputed", "chikungunya_mice_mids.rds"))
 
+# Tablas de comparación NA antes/después
 write.csv(res_dengue$comparacion,
           here("data", "imputed", "comparacion_na_dengue.csv"),
           row.names = FALSE)
@@ -311,6 +385,7 @@ diagnostico_imputacion <- function(df_orig, df_final, nombre, res) {
   cat("\n---", nombre, "---\n")
   
   estados_orig <- clasificar_celdas(df_orig)
+  
   na_orig  <- sum(sapply(estados_orig, function(x) sum(x == "faltante")))
   
   cols_data <- df_final %>%
@@ -319,14 +394,15 @@ diagnostico_imputacion <- function(df_orig, df_final, nombre, res) {
   
   cat("Celdas faltante real (original): ", comma(na_orig), "\n")
   cat("Celdas NA en df final:            ", comma(na_final), "\n")
-  cat("Método usado:                     pmm\n")
+  cat("Método usado:                     ",
+      ifelse(nombre == "DENGUE", "rf", "pmm"), "\n")
   cat("Tiempo total:                     ", res$tiempo_min, "min\n")
   
   cols_con_na <- names(cols_data)[sapply(cols_data, function(x) any(is.na(x)))]
   
   if (length(cols_con_na) > 0) {
     cat("Variables excluidas con NA:      ", length(cols_con_na), "\n")
-    cat("  (identificadores, fechas de proceso, administrativas)\n")
+    cat("  (son las que no entraron a imputar: identificadores, fechas de proceso, etc.)\n")
     print(head(cols_con_na, 20))
   } else {
     cat("Todas las variables candidatas fueron imputadas.\n")
@@ -338,12 +414,12 @@ diagnostico_imputacion(chikungunya, chikungunya_final, "CHIKUNGUNYA", res_chik)
 
 cat("\n")
 cat("=========================================================\n")
-cat("✅ IMPUTACIÓN COMPLETADA (todo con pmm)\n")
+cat("✅ IMPUTACIÓN COMPLETADA\n")
 cat("=========================================================\n")
 cat("Archivos en data/imputed/:\n")
 cat("  - dengue_imputado.rds\n")
 cat("  - chikungunya_imputado.rds\n")
-cat("  - dengue_mice_mids.rds\n")
+cat("  - dengue_mice_mids.rds        (objeto mids para pooling)\n")
 cat("  - chikungunya_mice_mids.rds\n")
 cat("  - comparacion_na_dengue.csv\n")
 cat("  - comparacion_na_chikungunya.csv\n")
