@@ -25,3 +25,6 @@ output/
 
 # Logs
 *.log
+
+.RDataTmp
+data/processed/*_crudo.rds
