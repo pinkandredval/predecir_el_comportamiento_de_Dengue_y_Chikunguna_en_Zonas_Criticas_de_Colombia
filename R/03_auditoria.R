@@ -75,3 +75,4 @@ auditar <- function(df, nombre) {
 
 auditar(dengue, "DENGUE")
 auditar(chikungunya, "CHIKUNGUNYA")
+
