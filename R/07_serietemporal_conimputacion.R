@@ -194,11 +194,119 @@ mensual_dengue <- validar_serie(serie_dengue, "Dengue")
 mensual_chik   <- validar_serie(serie_chik,   "Chikungunya")
 
 # ============================================================
+# 2b. Serie municipal (nueva)
+# ============================================================
+# Se construye a partir de cod_dpto_o + cod_mun_o. En el SIVIGILA,
+# cod_mun_o viene con 3 dígitos (código del municipio dentro del
+# departamento); el código DIVIPOLA municipal de 5 dígitos se forma
+# concatenando cod_dpto_o (2 dígitos) + cod_mun_o (3 dígitos).
+# Ejemplo: 13 + 001 = 13001 (Cartagena); 11 + 001 = 11001 (Bogotá).
+#
+# Se conservan todos los municipios observados y se agregan
+# explícitamente Bogotá (11001) y Cartagena (13001) aunque no tengan
+# casos, para que las regiones EMA puedan construirse con cero.
+# No se toca la serie departamental/nacional existente.
+
+construir_serie_municipal <- function(df, nombre_evento) {
+  if (!"cod_mun_o" %in% names(df)) {
+    warning(
+      "La base de ", nombre_evento, " no tiene la columna 'cod_mun_o'; ",
+      "no se puede construir la serie municipal.",
+      call. = FALSE
+    )
+    return(NULL)
+  }
+
+  if (!"cod_dpto_o" %in% names(df)) {
+    warning(
+      "La base de ", nombre_evento, " no tiene la columna 'cod_dpto_o'; ",
+      "no se puede formar el código municipal DIVIPOLA de 5 dígitos.",
+      call. = FALSE
+    )
+    return(NULL)
+  }
+
+  df_serie <- df %>%
+    mutate(
+      anio_num   = as.integer(anio),
+      semana_num = as.integer(semana),
+      cod_dpto_o = str_pad(as.character(cod_dpto_o), 2, pad = "0"),
+      cod_mun_o  = str_pad(as.character(cod_mun_o), 3, pad = "0"),
+      cod_mun_o  = if_else(
+        nchar(cod_mun_o) == 3,
+        paste0(cod_dpto_o, cod_mun_o),
+        cod_mun_o
+      )
+    ) %>%
+    filter(
+      !is.na(anio_num), !is.na(semana_num),
+      anio_num >= 2020, anio_num <= 2025,
+      !is.na(cod_dpto_o), !is.na(cod_mun_o),
+      cod_dpto_o != "01",
+      nchar(cod_mun_o) == 5
+    )
+
+  conteos <- df_serie %>%
+    count(cod_mun_o, anio = anio_num, semana = semana_num, name = "casos")
+
+  # Bogotá (11001), Cartagena (13001) y los dos municipios de San Andrés
+  # (88001 y 88564) se incluyen aunque no tengan casos, para que las 12
+  # regiones EMA tengan al menos una fila municipal en la serie.
+  municipios <- sort(unique(c(
+    conteos$cod_mun_o,
+    "11001", "13001", "88001", "88564"
+  )))
+
+  serie <- expand_grid(
+    cod_mun_o = municipios,
+    calendario_semanal
+  ) %>%
+    left_join(conteos, by = c("cod_mun_o", "anio", "semana")) %>%
+    mutate(casos = tidyr::replace_na(casos, 0L)) %>%
+    select(cod_mun_o, anio, semana, fecha_sem, casos) %>%
+    arrange(cod_mun_o, anio, semana)
+
+  stopifnot(
+    all(c("cod_mun_o", "anio", "semana", "fecha_sem", "casos") %in% names(serie)),
+    nrow(serie) == length(municipios) * nrow(calendario_semanal),
+    !anyNA(serie$casos),
+    all(serie$casos >= 0)
+  )
+
+  cat(
+    "\nSerie municipal ", nombre_evento, ": ",
+    length(municipios), " municipios x ",
+    nrow(calendario_semanal), " semanas = ",
+    nrow(serie), " filas\n",
+    sep = ""
+  )
+
+  serie
+}
+
+serie_dengue_municipal <- construir_serie_municipal(dengue_imp, "Dengue")
+serie_chik_municipal   <- construir_serie_municipal(chikungunya_imp, "Chikungunya")
+
+# ============================================================
 # 3. Guardar
 # ============================================================
 
 saveRDS(serie_dengue, here("data", "series", "serie_dengue.rds"))
 saveRDS(serie_chik,   here("data", "series", "serie_chik.rds"))
+
+# Nuevas series municipales (no reemplazan a las departamentales)
+if (!is.null(serie_dengue_municipal)) {
+  saveRDS(
+    serie_dengue_municipal,
+    here("data", "series", "serie_dengue_municipal.rds")
+  )
+}
+if (!is.null(serie_chik_municipal)) {
+  saveRDS(
+    serie_chik_municipal,
+    here("data", "series", "serie_chik_municipal.rds")
+  )
+}
 
 write.csv(serie_dengue, here("data", "series", "serie_dengue.csv"), row.names = FALSE)
 write.csv(serie_chik,   here("data", "series", "serie_chik.csv"),   row.names = FALSE)
