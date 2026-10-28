@@ -1,0 +1,8 @@
+"evento","modelo","escala","mape","mase","aic","comparable_sarima","util","nota"
+"Dengue","SARIMA","mensual",105.038903938546,1.16947668138369,436.515689588612,TRUE,FALSE,"MAPE/MASE en ventana reservada; MAPE excluye meses con 0 casos"
+"Dengue","VAR","mensual",23.3244829505566,0.995212143847996,,FALSE,,"MAPE/MASE in-sample alineados; AIC conjunta del VAR no comparable con univariados"
+"Chikungunya","SARIMA","mensual",205.642931403166,0.758055296646681,492.021695392626,TRUE,TRUE,"MAPE/MASE en ventana reservada; MAPE excluye meses con 0 casos"
+"Chikungunya","ETS","mensual",253.675927628023,0.917661859309578,597.510399305203,TRUE,TRUE,"MAPE/MASE en ventana reservada; MAPE excluye meses con 0 casos"
+"Chikungunya","VAR","mensual",65.2254175290945,0.847776541237391,,FALSE,,"MAPE/MASE in-sample alineados; AIC conjunta del VAR no comparable con univariados"
+"Dengue","GARCH mensual (sGARCH)","mensual (Box-Cox)",,,453.44604574164,TRUE,,"AIC total = infocriteria*T (T=72); misma muestra y transformación que el SARIMA; NO estima ARCH (retirado); Nyblom=8.759 (crítico 5%=1.47); sign bias conjunto p=0.124"
+"Dengue","GJR-GARCH semanal","semanal (log1p)",,,-657.675486379174,FALSE,,"AIC total = infocriteria*T (T=313); NO comparable con el SARIMA mensual (frecuencia/transformación); alpha/gamma no significativos; Nyblom=29.047 (crítico 5%=2.75); sign bias conjunto p=0.364"

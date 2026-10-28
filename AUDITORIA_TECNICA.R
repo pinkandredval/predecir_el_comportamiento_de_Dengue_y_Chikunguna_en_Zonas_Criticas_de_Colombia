@@ -23,8 +23,8 @@ for (f in list.files("R", pattern = "\\.R$", full.names = TRUE)) {
 
 # ------------------------------------------------------------
 hr("2. INTEGRIDAD DE LA BASE")
-d <- readRDS("data/processed/dengue_prep.rds")
-ch <- readRDS("data/processed/chikungunya_prep.rds")
+d <- readRDS("data/D_02/dengue_prep.rds")
+ch <- readRDS("data/D_02/chikungunya_prep.rds")
 cat("Dengue:        ", nrow(d), "filas x", ncol(d), "columnas\n")
 cat("Chikungunya:   ", nrow(ch), "filas x", ncol(ch), "columnas\n")
 cat("Duplicados de 'consecutive' (dengue):", sum(duplicated(d$consecutive)), "\n")
@@ -45,8 +45,8 @@ cat("Filas con 'BOGOT' en departamento_ocurrencia:",
 
 # ------------------------------------------------------------
 hr("3. COBERTURA TEMPORAL DE LAS SERIES")
-sd <- readRDS("data/series/serie_dengue.rds")
-sc <- readRDS("data/series/serie_chik.rds")
+sd <- readRDS("data/D_07/serie_dengue.rds")
+sc <- readRDS("data/D_07/serie_chik.rds")
 for (nm in c("dengue", "chik")) {
   s <- if (nm == "dengue") sd else sc
   nac <- subset(s, dpto == "NACIONAL")
@@ -59,7 +59,7 @@ for (nm in c("dengue", "chik")) {
 
 # ------------------------------------------------------------
 hr("4. MODELO SARIMA (08)")
-e <- readRDS("data/series/econometria_sarima.rds")
+e <- readRDS("data/D_08/econometria_sarima.rds")
 for (nm in names(e)) {
   x <- e[[nm]]
   cat("\n--", nm, "--\n")
@@ -76,7 +76,7 @@ for (nm in names(e)) {
 
 # ------------------------------------------------------------
 hr("5. GARCH (09)")
-a <- readRDS("data/series/econometria_avanzada.rds")
+a <- readRDS("data/D_09/econometria_avanzada.rds")
 g <- a$garch_dengue
 mc <- g@fit$matcoef
 ar <- mc[grep("^ar", rownames(mc)), 1]

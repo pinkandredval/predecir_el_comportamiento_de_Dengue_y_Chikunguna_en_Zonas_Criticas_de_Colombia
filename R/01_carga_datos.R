@@ -39,6 +39,6 @@ table(dengue$anio)
 table(chikungunya$anio)
 
 # --- Guardar como RDS para no repetir la lectura ---
-dir.create(here("data", "processed"), showWarnings = FALSE)
-saveRDS(dengue, here("data", "processed", "dengue_crudo.rds"))
-saveRDS(chikungunya, here("data", "processed", "chikungunya_crudo.rds"))
+dir.create(here("data", "D_01"), showWarnings = FALSE, recursive = TRUE)
+saveRDS(dengue, here("data", "D_01", "dengue_crudo.rds"))
+saveRDS(chikungunya, here("data", "D_01", "chikungunya_crudo.rds"))

@@ -16,9 +16,30 @@ data/raw/**/*.csv
 data/raw/**/*.xlsx
 data/raw/**/*.zip
 
-# Datos procesados (pesados, se regeneran)
-data/processed/
+# Datos generados por los scripts (pesados, se regeneran)
+# La carpeta D_XX corresponde al script XX que produce sus archivos.
+# Red de seguridad: ningún .rds se versiona.
 *.rds
+
+# D_01: dengue_crudo.rds, chikungunya_crudo.rds
+data/D_01/*.rds
+# D_02: dengue_prep.rds, chikungunya_prep.rds
+data/D_02/*.rds
+data/D_05/*.rds
+# D_06: datos imputados y objetos mids de mice
+data/D_06/*.rds
+data/D_07/*.rds
+data/D_08/*.rds
+data/D_09/*.rds
+data/D_10/*.rds
+data/D_13/*.rds
+
+# Microdatos imputados (mids de mice, para pooling posterior)
+data/D_06/*_mice_mids.rds
+data/D_06/comparacion_na_*.csv
+
+# Diagnóstico pre-imputación (se regenera con el script 05)
+data/D_05/diagnostico_imputacion.csv
 
 # Outputs
 output/
@@ -27,4 +48,3 @@ output/
 *.log
 
 .RDataTmp
-data/processed/*_crudo.rds

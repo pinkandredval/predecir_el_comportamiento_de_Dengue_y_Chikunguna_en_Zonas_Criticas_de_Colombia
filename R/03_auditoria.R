@@ -7,8 +7,8 @@ library(tidyverse)
 library(here)
 library(janitor)
 
-dengue      <- readRDS(here("data", "processed", "dengue_prep.rds"))
-chikungunya <- readRDS(here("data", "processed", "chikungunya_prep.rds"))
+dengue      <- readRDS(here("data", "D_02", "dengue_prep.rds"))
+chikungunya <- readRDS(here("data", "D_02", "chikungunya_prep.rds"))
 
 auditar <- function(df, nombre) {
   cat("\n==================================================\n")
@@ -16,7 +16,7 @@ auditar <- function(df, nombre) {
   cat("==================================================\n")
   
   # --- Excluir columnas auxiliares na_estructural_* ---
-  df_analisis <- df %>% select(-starts_with("na_estructural"))
+  df_analisis <- df %>% dplyr::select(-starts_with("na_estructural"))
   
   cat("\nDimensiones:", nrow(df), "filas x", ncol(df), "columnas\n")
   cat("Columnas de análisis (sin auxiliares):", ncol(df_analisis), "\n")

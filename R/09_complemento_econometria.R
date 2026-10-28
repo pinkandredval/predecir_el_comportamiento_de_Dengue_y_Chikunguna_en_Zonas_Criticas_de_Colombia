@@ -33,13 +33,14 @@ suppressPackageStartupMessages({
 })
 
 # --- Cargar resultados del 08 (NO recalcular SARIMA) ---
-stopifnot(file.exists(here("data", "series", "econometria_sarima.rds")))
-res_econ <- readRDS(here("data", "series", "econometria_sarima.rds"))
+stopifnot(file.exists(here("data", "D_08", "econometria_sarima.rds")))
+res_econ <- readRDS(here("data", "D_08", "econometria_sarima.rds"))
 
-serie_dengue <- readRDS(here("data", "series", "serie_dengue.rds"))
-serie_chik   <- readRDS(here("data", "series", "serie_chik.rds"))
+serie_dengue <- readRDS(here("data", "D_07", "serie_dengue.rds"))
+serie_chik   <- readRDS(here("data", "D_07", "serie_chik.rds"))
 
-dir.create(here("graficas", "econometria_avanzada"),
+dir.create(here("data", "D_09"), recursive = TRUE, showWarnings = FALSE)
+dir.create(here("graficas", "G_09"),
            recursive = TRUE, showWarnings = FALSE)
 
 # ============================================================
@@ -49,7 +50,7 @@ dir.create(here("graficas", "econometria_avanzada"),
 preparar_mensual <- function(serie, nombre) {
   serie %>%
     filter(dpto == "NACIONAL") %>%
-    mutate(mes = floor_date(fecha_sem, "month")) %>%
+    mutate(mes = floor_date(fecha_sem + 3, "month")) %>%  # jueves de la semana (ISO)
     group_by(mes) %>%
     summarise(casos = sum(casos, na.rm = TRUE), .groups = "drop") %>%
     complete(mes = seq(min(mes), max(mes), by = "month"),
@@ -151,7 +152,7 @@ print(granger_chik_a_dengue$Granger)
 set.seed(123)
 irf_var <- irf(fit_var, n.ahead = 12, boot = TRUE, ci = 0.95)
 
-png(here("graficas", "econometria_avanzada", "var_irf.png"),
+png(here("graficas", "G_09", "var_irf.png"),
     width = 1200, height = 800, res = 150)
 plot(irf_var)
 dev.off()
@@ -159,7 +160,7 @@ dev.off()
 # --- FEVD ---
 fevd_var <- fevd(fit_var, n.ahead = 12)
 
-png(here("graficas", "econometria_avanzada", "var_fevd.png"),
+png(here("graficas", "G_09", "var_fevd.png"),
     width = 1200, height = 800, res = 150)
 plot(fevd_var)
 dev.off()
@@ -273,12 +274,12 @@ print(Box.test(resid_std_m^2, lag = 12, type = "Ljung-Box"))
 # ------------------------------------------------------------
 # La serie mensual tiene 72 observaciones: demasiado corta para
 # identificar un GARCH. El diagnóstico de volatilidad se hace sobre
-# las 314 semanas, con estacionalidad anual (armónicos) y AR(1).
+# las 313 semanas MMWR, con estacionalidad anual (armónicos) y AR(1).
 sem_dengue <- serie_dengue %>%
   filter(dpto == "NACIONAL") %>%
   arrange(anio, semana)
 
-stopifnot(nrow(sem_dengue) == 314L)
+stopifnot(nrow(sem_dengue) == 313L)
 
 y_sem <- ts(log1p(sem_dengue$casos), frequency = 52)
 r_semanal <- as.numeric(y_sem)
@@ -322,7 +323,7 @@ if (is.null(fit_garch_semanal) || convergence(fit_garch_semanal) != 0) {
 stopifnot(!is.null(fit_garch_semanal),
           convergence(fit_garch_semanal) == 0)
 
-cat("\n--- GARCH semanal (log1p, 314 semanas) ---\n")
+cat("\n--- GARCH semanal (log1p, 313 semanas) ---\n")
 print(fit_garch_semanal)
 
 mat_w <- fit_garch_semanal@fit$matcoef
@@ -449,7 +450,7 @@ print(Box.test(resid_ets, lag = 24, type = "Ljung-Box"))
 
 forecast_ets <- forecast(fit_ets, h = h)
 
-png(here("graficas", "econometria_avanzada", "ets_chikungunya.png"),
+png(here("graficas", "G_09", "ets_chikungunya.png"),
     width = 1200, height = 600, res = 150)
 plot(forecast_ets, main = "Pronóstico ETS — Chikungunya",
      xlab = "Año", ylab = "Casos")
@@ -655,12 +656,12 @@ saveRDS(
                  var_chik      = mase_var_chik),
     resumen           = resumen_avanzado
   ),
-  here("data", "series", "econometria_avanzada.rds")
+  here("data", "D_09", "econometria_avanzada.rds")
 )
 
 write.csv(
   resumen_avanzado,
-  here("data", "series", "resumen_econometria_avanzada.csv"),
+  here("data", "D_09", "resumen_econometria_avanzada.csv"),
   row.names = FALSE,
   na = ""
 )

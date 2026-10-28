@@ -9,8 +9,8 @@ library(janitor)
 library(lubridate)
 
 # --- Cargar crudos ---
-dengue      <- readRDS(here("data", "processed", "dengue_crudo.rds"))
-chikungunya <- readRDS(here("data", "processed", "chikungunya_crudo.rds"))
+dengue      <- readRDS(here("data", "D_01", "dengue_crudo.rds"))
+chikungunya <- readRDS(here("data", "D_01", "chikungunya_crudo.rds"))
 
 # --- Función para parsear fechas del SIVIGILA ---
 parsear_fecha <- function(x) {
@@ -38,7 +38,7 @@ preparar <- function(df, evento) {
       
       fecha_epi = make_date(anio) + weeks(semana - 1)
     ) %>%
-    select(-any_of(c("gru_pob", "cbmete")))
+    dplyr::select(-any_of(c("gru_pob", "cbmete")))
 }
 
 # --- Aplicar preparación básica ---
@@ -155,7 +155,8 @@ cat("Faltantes reales fm_grado (militares sin grado):",
     sum(chikungunya$na_estructural_fm_grado == FALSE & is.na(chikungunya$fm_grado)), "\n")
 
 # --- Guardar ---
-saveRDS(dengue,      here("data", "processed", "dengue_prep.rds"))
-saveRDS(chikungunya, here("data", "processed", "chikungunya_prep.rds"))
+dir.create(here("data", "D_02"), showWarnings = FALSE, recursive = TRUE)
+saveRDS(dengue,      here("data", "D_02", "dengue_prep.rds"))
+saveRDS(chikungunya, here("data", "D_02", "chikungunya_prep.rds"))
 
 cat("\n✅ Bases procesadas y guardadas con marcado de NA estructurales.\n")

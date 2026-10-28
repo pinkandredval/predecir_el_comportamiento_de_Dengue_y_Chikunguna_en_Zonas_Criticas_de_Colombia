@@ -1,0 +1,865 @@
+region_ema,date,atencion
+Antioquia,2020-01-01,0
+Antioquia,2020-02-01,56
+Antioquia,2020-03-01,100
+Antioquia,2020-04-01,0
+Antioquia,2020-05-01,72
+Antioquia,2020-06-01,45
+Antioquia,2020-07-01,52
+Antioquia,2020-08-01,54
+Antioquia,2020-09-01,0
+Antioquia,2020-10-01,38
+Antioquia,2020-11-01,0
+Antioquia,2020-12-01,32
+Antioquia,2021-01-01,41
+Antioquia,2021-02-01,0
+Antioquia,2021-03-01,26
+Antioquia,2021-04-01,29
+Antioquia,2021-05-01,0
+Antioquia,2021-06-01,0
+Antioquia,2021-07-01,0
+Antioquia,2021-08-01,27
+Antioquia,2021-09-01,35
+Antioquia,2021-10-01,39
+Antioquia,2021-11-01,0
+Antioquia,2021-12-01,0
+Antioquia,2022-01-01,0
+Antioquia,2022-02-01,29
+Antioquia,2022-03-01,0
+Antioquia,2022-04-01,43
+Antioquia,2022-05-01,31
+Antioquia,2022-06-01,0
+Antioquia,2022-07-01,26
+Antioquia,2022-08-01,38
+Antioquia,2022-09-01,28
+Antioquia,2022-10-01,32
+Antioquia,2022-11-01,29
+Antioquia,2022-12-01,0
+Antioquia,2023-01-01,29
+Antioquia,2023-02-01,0
+Antioquia,2023-03-01,25
+Antioquia,2023-04-01,0
+Antioquia,2023-05-01,29
+Antioquia,2023-06-01,0
+Antioquia,2023-07-01,26
+Antioquia,2023-08-01,29
+Antioquia,2023-09-01,32
+Antioquia,2023-10-01,34
+Antioquia,2023-11-01,28
+Antioquia,2023-12-01,30
+Antioquia,2024-01-01,0
+Antioquia,2024-02-01,32
+Antioquia,2024-03-01,0
+Antioquia,2024-04-01,0
+Antioquia,2024-05-01,37
+Antioquia,2024-06-01,56
+Antioquia,2024-07-01,28
+Antioquia,2024-08-01,41
+Antioquia,2024-09-01,0
+Antioquia,2024-10-01,40
+Antioquia,2024-11-01,31
+Antioquia,2024-12-01,0
+Antioquia,2025-01-01,33
+Antioquia,2025-02-01,0
+Antioquia,2025-03-01,40
+Antioquia,2025-04-01,0
+Antioquia,2025-05-01,57
+Antioquia,2025-06-01,0
+Antioquia,2025-07-01,35
+Antioquia,2025-08-01,0
+Antioquia,2025-09-01,0
+Antioquia,2025-10-01,0
+Antioquia,2025-11-01,0
+Antioquia,2025-12-01,32
+Bogotá D.C.,2020-01-01,100
+Bogotá D.C.,2020-02-01,47
+Bogotá D.C.,2020-03-01,95
+Bogotá D.C.,2020-04-01,40
+Bogotá D.C.,2020-05-01,46
+Bogotá D.C.,2020-06-01,25
+Bogotá D.C.,2020-07-01,34
+Bogotá D.C.,2020-08-01,27
+Bogotá D.C.,2020-09-01,31
+Bogotá D.C.,2020-10-01,34
+Bogotá D.C.,2020-11-01,18
+Bogotá D.C.,2020-12-01,37
+Bogotá D.C.,2021-01-01,22
+Bogotá D.C.,2021-02-01,22
+Bogotá D.C.,2021-03-01,39
+Bogotá D.C.,2021-04-01,32
+Bogotá D.C.,2021-05-01,29
+Bogotá D.C.,2021-06-01,33
+Bogotá D.C.,2021-07-01,17
+Bogotá D.C.,2021-08-01,33
+Bogotá D.C.,2021-09-01,0
+Bogotá D.C.,2021-10-01,21
+Bogotá D.C.,2021-11-01,24
+Bogotá D.C.,2021-12-01,0
+Bogotá D.C.,2022-01-01,36
+Bogotá D.C.,2022-02-01,36
+Bogotá D.C.,2022-03-01,31
+Bogotá D.C.,2022-04-01,42
+Bogotá D.C.,2022-05-01,27
+Bogotá D.C.,2022-06-01,21
+Bogotá D.C.,2022-07-01,48
+Bogotá D.C.,2022-08-01,18
+Bogotá D.C.,2022-09-01,22
+Bogotá D.C.,2022-10-01,23
+Bogotá D.C.,2022-11-01,22
+Bogotá D.C.,2022-12-01,21
+Bogotá D.C.,2023-01-01,0
+Bogotá D.C.,2023-02-01,33
+Bogotá D.C.,2023-03-01,34
+Bogotá D.C.,2023-04-01,20
+Bogotá D.C.,2023-05-01,31
+Bogotá D.C.,2023-06-01,34
+Bogotá D.C.,2023-07-01,35
+Bogotá D.C.,2023-08-01,32
+Bogotá D.C.,2023-09-01,50
+Bogotá D.C.,2023-10-01,31
+Bogotá D.C.,2023-11-01,45
+Bogotá D.C.,2023-12-01,26
+Bogotá D.C.,2024-01-01,36
+Bogotá D.C.,2024-02-01,29
+Bogotá D.C.,2024-03-01,35
+Bogotá D.C.,2024-04-01,36
+Bogotá D.C.,2024-05-01,30
+Bogotá D.C.,2024-06-01,48
+Bogotá D.C.,2024-07-01,38
+Bogotá D.C.,2024-08-01,29
+Bogotá D.C.,2024-09-01,28
+Bogotá D.C.,2024-10-01,19
+Bogotá D.C.,2024-11-01,30
+Bogotá D.C.,2024-12-01,25
+Bogotá D.C.,2025-01-01,0
+Bogotá D.C.,2025-02-01,0
+Bogotá D.C.,2025-03-01,25
+Bogotá D.C.,2025-04-01,36
+Bogotá D.C.,2025-05-01,28
+Bogotá D.C.,2025-06-01,0
+Bogotá D.C.,2025-07-01,42
+Bogotá D.C.,2025-08-01,37
+Bogotá D.C.,2025-09-01,23
+Bogotá D.C.,2025-10-01,28
+Bogotá D.C.,2025-11-01,36
+Bogotá D.C.,2025-12-01,30
+Cartagena,2020-01-01,0
+Cartagena,2020-02-01,0
+Cartagena,2020-03-01,0
+Cartagena,2020-04-01,0
+Cartagena,2020-05-01,0
+Cartagena,2020-06-01,0
+Cartagena,2020-07-01,0
+Cartagena,2020-08-01,0
+Cartagena,2020-09-01,0
+Cartagena,2020-10-01,0
+Cartagena,2020-11-01,0
+Cartagena,2020-12-01,0
+Cartagena,2021-01-01,0
+Cartagena,2021-02-01,0
+Cartagena,2021-03-01,0
+Cartagena,2021-04-01,0
+Cartagena,2021-05-01,0
+Cartagena,2021-06-01,0
+Cartagena,2021-07-01,0
+Cartagena,2021-08-01,0
+Cartagena,2021-09-01,0
+Cartagena,2021-10-01,0
+Cartagena,2021-11-01,0
+Cartagena,2021-12-01,0
+Cartagena,2022-01-01,0
+Cartagena,2022-02-01,0
+Cartagena,2022-03-01,0
+Cartagena,2022-04-01,0
+Cartagena,2022-05-01,0
+Cartagena,2022-06-01,0
+Cartagena,2022-07-01,0
+Cartagena,2022-08-01,0
+Cartagena,2022-09-01,0
+Cartagena,2022-10-01,0
+Cartagena,2022-11-01,0
+Cartagena,2022-12-01,0
+Cartagena,2023-01-01,0
+Cartagena,2023-02-01,0
+Cartagena,2023-03-01,0
+Cartagena,2023-04-01,0
+Cartagena,2023-05-01,0
+Cartagena,2023-06-01,0
+Cartagena,2023-07-01,0
+Cartagena,2023-08-01,0
+Cartagena,2023-09-01,0
+Cartagena,2023-10-01,0
+Cartagena,2023-11-01,0
+Cartagena,2023-12-01,0
+Cartagena,2024-01-01,0
+Cartagena,2024-02-01,0
+Cartagena,2024-03-01,0
+Cartagena,2024-04-01,0
+Cartagena,2024-05-01,100
+Cartagena,2024-06-01,0
+Cartagena,2024-07-01,0
+Cartagena,2024-08-01,0
+Cartagena,2024-09-01,0
+Cartagena,2024-10-01,0
+Cartagena,2024-11-01,0
+Cartagena,2024-12-01,0
+Cartagena,2025-01-01,0
+Cartagena,2025-02-01,0
+Cartagena,2025-03-01,0
+Cartagena,2025-04-01,0
+Cartagena,2025-05-01,0
+Cartagena,2025-06-01,0
+Cartagena,2025-07-01,0
+Cartagena,2025-08-01,0
+Cartagena,2025-09-01,0
+Cartagena,2025-10-01,0
+Cartagena,2025-11-01,0
+Cartagena,2025-12-01,0
+Golfo Morrosquillo y Sabana,2020-01-01,0
+Golfo Morrosquillo y Sabana,2020-02-01,0
+Golfo Morrosquillo y Sabana,2020-03-01,0
+Golfo Morrosquillo y Sabana,2020-04-01,0
+Golfo Morrosquillo y Sabana,2020-05-01,0
+Golfo Morrosquillo y Sabana,2020-06-01,0
+Golfo Morrosquillo y Sabana,2020-07-01,0
+Golfo Morrosquillo y Sabana,2020-08-01,0
+Golfo Morrosquillo y Sabana,2020-09-01,0
+Golfo Morrosquillo y Sabana,2020-10-01,0
+Golfo Morrosquillo y Sabana,2020-11-01,0
+Golfo Morrosquillo y Sabana,2020-12-01,0
+Golfo Morrosquillo y Sabana,2021-01-01,0
+Golfo Morrosquillo y Sabana,2021-02-01,0
+Golfo Morrosquillo y Sabana,2021-03-01,0
+Golfo Morrosquillo y Sabana,2021-04-01,0
+Golfo Morrosquillo y Sabana,2021-05-01,0
+Golfo Morrosquillo y Sabana,2021-06-01,0
+Golfo Morrosquillo y Sabana,2021-07-01,0
+Golfo Morrosquillo y Sabana,2021-08-01,0
+Golfo Morrosquillo y Sabana,2021-09-01,0
+Golfo Morrosquillo y Sabana,2021-10-01,0
+Golfo Morrosquillo y Sabana,2021-11-01,0
+Golfo Morrosquillo y Sabana,2021-12-01,0
+Golfo Morrosquillo y Sabana,2022-01-01,0
+Golfo Morrosquillo y Sabana,2022-02-01,0
+Golfo Morrosquillo y Sabana,2022-03-01,0
+Golfo Morrosquillo y Sabana,2022-04-01,0
+Golfo Morrosquillo y Sabana,2022-05-01,0
+Golfo Morrosquillo y Sabana,2022-06-01,0
+Golfo Morrosquillo y Sabana,2022-07-01,0
+Golfo Morrosquillo y Sabana,2022-08-01,0
+Golfo Morrosquillo y Sabana,2022-09-01,0
+Golfo Morrosquillo y Sabana,2022-10-01,0
+Golfo Morrosquillo y Sabana,2022-11-01,0
+Golfo Morrosquillo y Sabana,2022-12-01,0
+Golfo Morrosquillo y Sabana,2023-01-01,0
+Golfo Morrosquillo y Sabana,2023-02-01,0
+Golfo Morrosquillo y Sabana,2023-03-01,0
+Golfo Morrosquillo y Sabana,2023-04-01,0
+Golfo Morrosquillo y Sabana,2023-05-01,0
+Golfo Morrosquillo y Sabana,2023-06-01,0
+Golfo Morrosquillo y Sabana,2023-07-01,0
+Golfo Morrosquillo y Sabana,2023-08-01,0
+Golfo Morrosquillo y Sabana,2023-09-01,0
+Golfo Morrosquillo y Sabana,2023-10-01,0
+Golfo Morrosquillo y Sabana,2023-11-01,0
+Golfo Morrosquillo y Sabana,2023-12-01,0
+Golfo Morrosquillo y Sabana,2024-01-01,0
+Golfo Morrosquillo y Sabana,2024-02-01,45.5
+Golfo Morrosquillo y Sabana,2024-03-01,0
+Golfo Morrosquillo y Sabana,2024-04-01,0
+Golfo Morrosquillo y Sabana,2024-05-01,50
+Golfo Morrosquillo y Sabana,2024-06-01,50
+Golfo Morrosquillo y Sabana,2024-07-01,0
+Golfo Morrosquillo y Sabana,2024-08-01,0
+Golfo Morrosquillo y Sabana,2024-09-01,0
+Golfo Morrosquillo y Sabana,2024-10-01,0
+Golfo Morrosquillo y Sabana,2024-11-01,0
+Golfo Morrosquillo y Sabana,2024-12-01,0
+Golfo Morrosquillo y Sabana,2025-01-01,0
+Golfo Morrosquillo y Sabana,2025-02-01,0
+Golfo Morrosquillo y Sabana,2025-03-01,0
+Golfo Morrosquillo y Sabana,2025-04-01,0
+Golfo Morrosquillo y Sabana,2025-05-01,0
+Golfo Morrosquillo y Sabana,2025-06-01,0
+Golfo Morrosquillo y Sabana,2025-07-01,0
+Golfo Morrosquillo y Sabana,2025-08-01,0
+Golfo Morrosquillo y Sabana,2025-09-01,0
+Golfo Morrosquillo y Sabana,2025-10-01,0
+Golfo Morrosquillo y Sabana,2025-11-01,0
+Golfo Morrosquillo y Sabana,2025-12-01,0
+Región Amazonía,2020-01-01,0
+Región Amazonía,2020-02-01,0
+Región Amazonía,2020-03-01,13.6
+Región Amazonía,2020-04-01,0
+Región Amazonía,2020-05-01,0
+Región Amazonía,2020-06-01,0
+Región Amazonía,2020-07-01,0
+Región Amazonía,2020-08-01,0
+Región Amazonía,2020-09-01,16.8
+Región Amazonía,2020-10-01,0
+Región Amazonía,2020-11-01,0
+Región Amazonía,2020-12-01,0
+Región Amazonía,2021-01-01,0
+Región Amazonía,2021-02-01,0
+Región Amazonía,2021-03-01,0
+Región Amazonía,2021-04-01,0
+Región Amazonía,2021-05-01,0
+Región Amazonía,2021-06-01,0
+Región Amazonía,2021-07-01,20
+Región Amazonía,2021-08-01,0
+Región Amazonía,2021-09-01,0
+Región Amazonía,2021-10-01,0
+Región Amazonía,2021-11-01,0
+Región Amazonía,2021-12-01,0
+Región Amazonía,2022-01-01,20
+Región Amazonía,2022-02-01,20
+Región Amazonía,2022-03-01,0
+Región Amazonía,2022-04-01,0
+Región Amazonía,2022-05-01,0
+Región Amazonía,2022-06-01,0
+Región Amazonía,2022-07-01,20
+Región Amazonía,2022-08-01,0
+Región Amazonía,2022-09-01,0
+Región Amazonía,2022-10-01,0
+Región Amazonía,2022-11-01,0
+Región Amazonía,2022-12-01,0
+Región Amazonía,2023-01-01,0
+Región Amazonía,2023-02-01,0
+Región Amazonía,2023-03-01,0
+Región Amazonía,2023-04-01,0
+Región Amazonía,2023-05-01,0
+Región Amazonía,2023-06-01,0
+Región Amazonía,2023-07-01,0
+Región Amazonía,2023-08-01,0
+Región Amazonía,2023-09-01,0
+Región Amazonía,2023-10-01,0
+Región Amazonía,2023-11-01,0
+Región Amazonía,2023-12-01,0
+Región Amazonía,2024-01-01,0
+Región Amazonía,2024-02-01,0
+Región Amazonía,2024-03-01,0
+Región Amazonía,2024-04-01,0
+Región Amazonía,2024-05-01,0
+Región Amazonía,2024-06-01,0
+Región Amazonía,2024-07-01,0
+Región Amazonía,2024-08-01,0
+Región Amazonía,2024-09-01,20
+Región Amazonía,2024-10-01,0
+Región Amazonía,2024-11-01,0
+Región Amazonía,2024-12-01,0
+Región Amazonía,2025-01-01,0
+Región Amazonía,2025-02-01,6.8
+Región Amazonía,2025-03-01,0
+Región Amazonía,2025-04-01,0
+Región Amazonía,2025-05-01,0
+Región Amazonía,2025-06-01,12.4
+Región Amazonía,2025-07-01,0
+Región Amazonía,2025-08-01,0
+Región Amazonía,2025-09-01,0
+Región Amazonía,2025-10-01,0
+Región Amazonía,2025-11-01,9.6
+Región Amazonía,2025-12-01,0
+Región Central,2020-01-01,18.5
+Región Central,2020-02-01,0
+Región Central,2020-03-01,17.5
+Región Central,2020-04-01,22.75
+Región Central,2020-05-01,0
+Región Central,2020-06-01,0
+Región Central,2020-07-01,0
+Región Central,2020-08-01,0
+Región Central,2020-09-01,0
+Región Central,2020-10-01,0
+Región Central,2020-11-01,25
+Región Central,2020-12-01,0
+Región Central,2021-01-01,0
+Región Central,2021-02-01,0
+Región Central,2021-03-01,0
+Región Central,2021-04-01,0
+Región Central,2021-05-01,0
+Región Central,2021-06-01,0
+Región Central,2021-07-01,19.25
+Región Central,2021-08-01,0
+Región Central,2021-09-01,0
+Región Central,2021-10-01,25
+Región Central,2021-11-01,0
+Región Central,2021-12-01,0
+Región Central,2022-01-01,0
+Región Central,2022-02-01,17.5
+Región Central,2022-03-01,0
+Región Central,2022-04-01,11.5
+Región Central,2022-05-01,0
+Región Central,2022-06-01,12
+Región Central,2022-07-01,0
+Región Central,2022-08-01,12.75
+Región Central,2022-09-01,0
+Región Central,2022-10-01,12.75
+Región Central,2022-11-01,0
+Región Central,2022-12-01,0
+Región Central,2023-01-01,0
+Región Central,2023-02-01,13.25
+Región Central,2023-03-01,0
+Región Central,2023-04-01,0
+Región Central,2023-05-01,0
+Región Central,2023-06-01,0
+Región Central,2023-07-01,0
+Región Central,2023-08-01,0
+Región Central,2023-09-01,0
+Región Central,2023-10-01,0
+Región Central,2023-11-01,0
+Región Central,2023-12-01,0
+Región Central,2024-01-01,0
+Región Central,2024-02-01,0
+Región Central,2024-03-01,0
+Región Central,2024-04-01,0
+Región Central,2024-05-01,17.75
+Región Central,2024-06-01,0
+Región Central,2024-07-01,16.75
+Región Central,2024-08-01,0
+Región Central,2024-09-01,0
+Región Central,2024-10-01,0
+Región Central,2024-11-01,22.75
+Región Central,2024-12-01,0
+Región Central,2025-01-01,25
+Región Central,2025-02-01,0
+Región Central,2025-03-01,16.75
+Región Central,2025-04-01,0
+Región Central,2025-05-01,0
+Región Central,2025-06-01,20.25
+Región Central,2025-07-01,0
+Región Central,2025-08-01,0
+Región Central,2025-09-01,0
+Región Central,2025-10-01,25
+Región Central,2025-11-01,0
+Región Central,2025-12-01,0
+Región Costa Caribe,2020-01-01,0
+Región Costa Caribe,2020-02-01,0
+Región Costa Caribe,2020-03-01,25
+Región Costa Caribe,2020-04-01,8.5
+Región Costa Caribe,2020-05-01,9
+Región Costa Caribe,2020-06-01,15.5
+Región Costa Caribe,2020-07-01,25
+Región Costa Caribe,2020-08-01,0
+Región Costa Caribe,2020-09-01,0
+Región Costa Caribe,2020-10-01,0
+Región Costa Caribe,2020-11-01,0
+Región Costa Caribe,2020-12-01,0
+Región Costa Caribe,2021-01-01,0
+Región Costa Caribe,2021-02-01,8.5
+Región Costa Caribe,2021-03-01,0
+Región Costa Caribe,2021-04-01,33.5
+Región Costa Caribe,2021-05-01,0
+Región Costa Caribe,2021-06-01,25
+Región Costa Caribe,2021-07-01,0
+Región Costa Caribe,2021-08-01,0
+Región Costa Caribe,2021-09-01,0
+Región Costa Caribe,2021-10-01,0
+Región Costa Caribe,2021-11-01,0
+Región Costa Caribe,2021-12-01,0
+Región Costa Caribe,2022-01-01,10
+Región Costa Caribe,2022-02-01,0
+Región Costa Caribe,2022-03-01,15
+Región Costa Caribe,2022-04-01,5.25
+Región Costa Caribe,2022-05-01,5.5
+Región Costa Caribe,2022-06-01,0
+Región Costa Caribe,2022-07-01,0
+Región Costa Caribe,2022-08-01,0
+Región Costa Caribe,2022-09-01,0
+Región Costa Caribe,2022-10-01,8.25
+Región Costa Caribe,2022-11-01,0
+Región Costa Caribe,2022-12-01,0
+Región Costa Caribe,2023-01-01,0
+Región Costa Caribe,2023-02-01,0
+Región Costa Caribe,2023-03-01,0
+Región Costa Caribe,2023-04-01,6
+Región Costa Caribe,2023-05-01,8.75
+Región Costa Caribe,2023-06-01,0
+Región Costa Caribe,2023-07-01,0
+Región Costa Caribe,2023-08-01,0
+Región Costa Caribe,2023-09-01,0
+Región Costa Caribe,2023-10-01,0
+Región Costa Caribe,2023-11-01,13.75
+Región Costa Caribe,2023-12-01,0
+Región Costa Caribe,2024-01-01,23.5
+Región Costa Caribe,2024-02-01,0
+Región Costa Caribe,2024-03-01,0
+Región Costa Caribe,2024-04-01,0
+Región Costa Caribe,2024-05-01,10.75
+Región Costa Caribe,2024-06-01,22.25
+Región Costa Caribe,2024-07-01,18.75
+Región Costa Caribe,2024-08-01,0
+Región Costa Caribe,2024-09-01,0
+Región Costa Caribe,2024-10-01,0
+Región Costa Caribe,2024-11-01,10
+Región Costa Caribe,2024-12-01,0
+Región Costa Caribe,2025-01-01,25
+Región Costa Caribe,2025-02-01,9.75
+Región Costa Caribe,2025-03-01,0
+Región Costa Caribe,2025-04-01,0
+Región Costa Caribe,2025-05-01,14.25
+Región Costa Caribe,2025-06-01,0
+Región Costa Caribe,2025-07-01,0
+Región Costa Caribe,2025-08-01,23.25
+Región Costa Caribe,2025-09-01,0
+Región Costa Caribe,2025-10-01,0
+Región Costa Caribe,2025-11-01,0
+Región Costa Caribe,2025-12-01,0
+Región Eje Cafetero,2020-01-01,0
+Región Eje Cafetero,2020-02-01,0
+Región Eje Cafetero,2020-03-01,0
+Región Eje Cafetero,2020-04-01,30
+Región Eje Cafetero,2020-05-01,0
+Región Eje Cafetero,2020-06-01,0
+Región Eje Cafetero,2020-07-01,0
+Región Eje Cafetero,2020-08-01,0
+Región Eje Cafetero,2020-09-01,50
+Región Eje Cafetero,2020-10-01,0
+Región Eje Cafetero,2020-11-01,0
+Región Eje Cafetero,2020-12-01,0
+Región Eje Cafetero,2021-01-01,0
+Región Eje Cafetero,2021-02-01,0
+Región Eje Cafetero,2021-03-01,0
+Región Eje Cafetero,2021-04-01,0
+Región Eje Cafetero,2021-05-01,0
+Región Eje Cafetero,2021-06-01,0
+Región Eje Cafetero,2021-07-01,0
+Región Eje Cafetero,2021-08-01,0
+Región Eje Cafetero,2021-09-01,0
+Región Eje Cafetero,2021-10-01,0
+Región Eje Cafetero,2021-11-01,0
+Región Eje Cafetero,2021-12-01,0
+Región Eje Cafetero,2022-01-01,0
+Región Eje Cafetero,2022-02-01,0
+Región Eje Cafetero,2022-03-01,0
+Región Eje Cafetero,2022-04-01,0
+Región Eje Cafetero,2022-05-01,0
+Región Eje Cafetero,2022-06-01,0
+Región Eje Cafetero,2022-07-01,0
+Región Eje Cafetero,2022-08-01,0
+Región Eje Cafetero,2022-09-01,0
+Región Eje Cafetero,2022-10-01,0
+Región Eje Cafetero,2022-11-01,0
+Región Eje Cafetero,2022-12-01,0
+Región Eje Cafetero,2023-01-01,0
+Región Eje Cafetero,2023-02-01,0
+Región Eje Cafetero,2023-03-01,0
+Región Eje Cafetero,2023-04-01,0
+Región Eje Cafetero,2023-05-01,0
+Región Eje Cafetero,2023-06-01,0
+Región Eje Cafetero,2023-07-01,0
+Región Eje Cafetero,2023-08-01,0
+Región Eje Cafetero,2023-09-01,0
+Región Eje Cafetero,2023-10-01,0
+Región Eje Cafetero,2023-11-01,0
+Región Eje Cafetero,2023-12-01,0
+Región Eje Cafetero,2024-01-01,0
+Región Eje Cafetero,2024-02-01,0
+Región Eje Cafetero,2024-03-01,0
+Región Eje Cafetero,2024-04-01,0
+Región Eje Cafetero,2024-05-01,0
+Región Eje Cafetero,2024-06-01,0
+Región Eje Cafetero,2024-07-01,0
+Región Eje Cafetero,2024-08-01,0
+Región Eje Cafetero,2024-09-01,0
+Región Eje Cafetero,2024-10-01,0
+Región Eje Cafetero,2024-11-01,41
+Región Eje Cafetero,2024-12-01,0
+Región Eje Cafetero,2025-01-01,0
+Región Eje Cafetero,2025-02-01,0
+Región Eje Cafetero,2025-03-01,0
+Región Eje Cafetero,2025-04-01,50
+Región Eje Cafetero,2025-05-01,0
+Región Eje Cafetero,2025-06-01,0
+Región Eje Cafetero,2025-07-01,0
+Región Eje Cafetero,2025-08-01,0
+Región Eje Cafetero,2025-09-01,0
+Región Eje Cafetero,2025-10-01,0
+Región Eje Cafetero,2025-11-01,0
+Región Eje Cafetero,2025-12-01,0
+Región Llanos Orinoquía,2020-01-01,0
+Región Llanos Orinoquía,2020-02-01,0
+Región Llanos Orinoquía,2020-03-01,0
+Región Llanos Orinoquía,2020-04-01,0
+Región Llanos Orinoquía,2020-05-01,0
+Región Llanos Orinoquía,2020-06-01,0
+Región Llanos Orinoquía,2020-07-01,0
+Región Llanos Orinoquía,2020-08-01,0
+Región Llanos Orinoquía,2020-09-01,0
+Región Llanos Orinoquía,2020-10-01,0
+Región Llanos Orinoquía,2020-11-01,25
+Región Llanos Orinoquía,2020-12-01,0
+Región Llanos Orinoquía,2021-01-01,0
+Región Llanos Orinoquía,2021-02-01,0
+Región Llanos Orinoquía,2021-03-01,0
+Región Llanos Orinoquía,2021-04-01,0
+Región Llanos Orinoquía,2021-05-01,0
+Región Llanos Orinoquía,2021-06-01,0
+Región Llanos Orinoquía,2021-07-01,0
+Región Llanos Orinoquía,2021-08-01,0
+Región Llanos Orinoquía,2021-09-01,0
+Región Llanos Orinoquía,2021-10-01,0
+Región Llanos Orinoquía,2021-11-01,0
+Región Llanos Orinoquía,2021-12-01,0
+Región Llanos Orinoquía,2022-01-01,0
+Región Llanos Orinoquía,2022-02-01,0
+Región Llanos Orinoquía,2022-03-01,13.25
+Región Llanos Orinoquía,2022-04-01,0
+Región Llanos Orinoquía,2022-05-01,0
+Región Llanos Orinoquía,2022-06-01,0
+Región Llanos Orinoquía,2022-07-01,0
+Región Llanos Orinoquía,2022-08-01,0
+Región Llanos Orinoquía,2022-09-01,0
+Región Llanos Orinoquía,2022-10-01,0
+Región Llanos Orinoquía,2022-11-01,0
+Región Llanos Orinoquía,2022-12-01,0
+Región Llanos Orinoquía,2023-01-01,0
+Región Llanos Orinoquía,2023-02-01,0
+Región Llanos Orinoquía,2023-03-01,0
+Región Llanos Orinoquía,2023-04-01,0
+Región Llanos Orinoquía,2023-05-01,0
+Región Llanos Orinoquía,2023-06-01,0
+Región Llanos Orinoquía,2023-07-01,0
+Región Llanos Orinoquía,2023-08-01,0
+Región Llanos Orinoquía,2023-09-01,0
+Región Llanos Orinoquía,2023-10-01,25
+Región Llanos Orinoquía,2023-11-01,0
+Región Llanos Orinoquía,2023-12-01,25
+Región Llanos Orinoquía,2024-01-01,0
+Región Llanos Orinoquía,2024-02-01,0
+Región Llanos Orinoquía,2024-03-01,0
+Región Llanos Orinoquía,2024-04-01,0
+Región Llanos Orinoquía,2024-05-01,25
+Región Llanos Orinoquía,2024-06-01,0
+Región Llanos Orinoquía,2024-07-01,0
+Región Llanos Orinoquía,2024-08-01,0
+Región Llanos Orinoquía,2024-09-01,0
+Región Llanos Orinoquía,2024-10-01,0
+Región Llanos Orinoquía,2024-11-01,0
+Región Llanos Orinoquía,2024-12-01,0
+Región Llanos Orinoquía,2025-01-01,0
+Región Llanos Orinoquía,2025-02-01,0
+Región Llanos Orinoquía,2025-03-01,0
+Región Llanos Orinoquía,2025-04-01,0
+Región Llanos Orinoquía,2025-05-01,0
+Región Llanos Orinoquía,2025-06-01,0
+Región Llanos Orinoquía,2025-07-01,0
+Región Llanos Orinoquía,2025-08-01,0
+Región Llanos Orinoquía,2025-09-01,0
+Región Llanos Orinoquía,2025-10-01,0
+Región Llanos Orinoquía,2025-11-01,0
+Región Llanos Orinoquía,2025-12-01,0
+Región Pacífico,2020-01-01,25
+Región Pacífico,2020-02-01,12.75
+Región Pacífico,2020-03-01,15
+Región Pacífico,2020-04-01,11
+Región Pacífico,2020-05-01,12.25
+Región Pacífico,2020-06-01,6.25
+Región Pacífico,2020-07-01,11.5
+Región Pacífico,2020-08-01,11
+Región Pacífico,2020-09-01,5.75
+Región Pacífico,2020-10-01,7.25
+Región Pacífico,2020-11-01,25
+Región Pacífico,2020-12-01,10.5
+Región Pacífico,2021-01-01,35.75
+Región Pacífico,2021-02-01,7.5
+Región Pacífico,2021-03-01,26.75
+Región Pacífico,2021-04-01,7.5
+Región Pacífico,2021-05-01,6.5
+Región Pacífico,2021-06-01,0
+Región Pacífico,2021-07-01,6.25
+Región Pacífico,2021-08-01,0
+Región Pacífico,2021-09-01,0
+Región Pacífico,2021-10-01,0
+Región Pacífico,2021-11-01,0
+Región Pacífico,2021-12-01,10.75
+Región Pacífico,2022-01-01,12.25
+Región Pacífico,2022-02-01,25
+Región Pacífico,2022-03-01,10
+Región Pacífico,2022-04-01,6.5
+Región Pacífico,2022-05-01,9
+Región Pacífico,2022-06-01,6.25
+Región Pacífico,2022-07-01,6
+Región Pacífico,2022-08-01,10.25
+Región Pacífico,2022-09-01,6
+Región Pacífico,2022-10-01,5.5
+Región Pacífico,2022-11-01,5.5
+Región Pacífico,2022-12-01,22.75
+Región Pacífico,2023-01-01,0
+Región Pacífico,2023-02-01,11.75
+Región Pacífico,2023-03-01,10.25
+Región Pacífico,2023-04-01,11.5
+Región Pacífico,2023-05-01,0
+Región Pacífico,2023-06-01,9.25
+Región Pacífico,2023-07-01,6.75
+Región Pacífico,2023-08-01,11.25
+Región Pacífico,2023-09-01,28.5
+Región Pacífico,2023-10-01,5.5
+Región Pacífico,2023-11-01,0
+Región Pacífico,2023-12-01,0
+Región Pacífico,2024-01-01,7.25
+Región Pacífico,2024-02-01,11
+Región Pacífico,2024-03-01,10
+Región Pacífico,2024-04-01,11
+Región Pacífico,2024-05-01,15.25
+Región Pacífico,2024-06-01,11
+Región Pacífico,2024-07-01,0
+Región Pacífico,2024-08-01,0
+Región Pacífico,2024-09-01,0
+Región Pacífico,2024-10-01,0
+Región Pacífico,2024-11-01,0
+Región Pacífico,2024-12-01,0
+Región Pacífico,2025-01-01,0
+Región Pacífico,2025-02-01,0
+Región Pacífico,2025-03-01,7
+Región Pacífico,2025-04-01,0
+Región Pacífico,2025-05-01,7
+Región Pacífico,2025-06-01,0
+Región Pacífico,2025-07-01,8.25
+Región Pacífico,2025-08-01,0
+Región Pacífico,2025-09-01,7.5
+Región Pacífico,2025-10-01,0
+Región Pacífico,2025-11-01,14
+Región Pacífico,2025-12-01,0
+Región Santanderes,2020-01-01,0
+Región Santanderes,2020-02-01,0
+Región Santanderes,2020-03-01,79.5
+Región Santanderes,2020-04-01,30.5
+Región Santanderes,2020-05-01,20
+Región Santanderes,2020-06-01,0
+Región Santanderes,2020-07-01,0
+Región Santanderes,2020-08-01,26
+Región Santanderes,2020-09-01,25
+Región Santanderes,2020-10-01,0
+Región Santanderes,2020-11-01,0
+Región Santanderes,2020-12-01,0
+Región Santanderes,2021-01-01,35
+Región Santanderes,2021-02-01,0
+Región Santanderes,2021-03-01,0
+Región Santanderes,2021-04-01,0
+Región Santanderes,2021-05-01,27
+Región Santanderes,2021-06-01,0
+Región Santanderes,2021-07-01,0
+Región Santanderes,2021-08-01,0
+Región Santanderes,2021-09-01,0
+Región Santanderes,2021-10-01,0
+Región Santanderes,2021-11-01,0
+Región Santanderes,2021-12-01,0
+Región Santanderes,2022-01-01,50
+Región Santanderes,2022-02-01,0
+Región Santanderes,2022-03-01,0
+Región Santanderes,2022-04-01,28.5
+Región Santanderes,2022-05-01,0
+Región Santanderes,2022-06-01,0
+Región Santanderes,2022-07-01,0
+Región Santanderes,2022-08-01,0
+Región Santanderes,2022-09-01,0
+Región Santanderes,2022-10-01,0
+Región Santanderes,2022-11-01,0
+Región Santanderes,2022-12-01,0
+Región Santanderes,2023-01-01,0
+Región Santanderes,2023-02-01,0
+Región Santanderes,2023-03-01,24.5
+Región Santanderes,2023-04-01,27
+Región Santanderes,2023-05-01,28
+Región Santanderes,2023-06-01,0
+Región Santanderes,2023-07-01,0
+Región Santanderes,2023-08-01,31.5
+Región Santanderes,2023-09-01,0
+Región Santanderes,2023-10-01,30
+Región Santanderes,2023-11-01,0
+Región Santanderes,2023-12-01,0
+Región Santanderes,2024-01-01,0
+Región Santanderes,2024-02-01,0
+Región Santanderes,2024-03-01,0
+Región Santanderes,2024-04-01,0
+Región Santanderes,2024-05-01,0
+Región Santanderes,2024-06-01,0
+Región Santanderes,2024-07-01,0
+Región Santanderes,2024-08-01,0
+Región Santanderes,2024-09-01,0
+Región Santanderes,2024-10-01,0
+Región Santanderes,2024-11-01,0
+Región Santanderes,2024-12-01,0
+Región Santanderes,2025-01-01,0
+Región Santanderes,2025-02-01,0
+Región Santanderes,2025-03-01,0
+Región Santanderes,2025-04-01,0
+Región Santanderes,2025-05-01,0
+Región Santanderes,2025-06-01,0
+Región Santanderes,2025-07-01,0
+Región Santanderes,2025-08-01,35.5
+Región Santanderes,2025-09-01,0
+Región Santanderes,2025-10-01,0
+Región Santanderes,2025-11-01,0
+Región Santanderes,2025-12-01,0
+San Andrés y Providencia,2020-01-01,0
+San Andrés y Providencia,2020-02-01,0
+San Andrés y Providencia,2020-03-01,0
+San Andrés y Providencia,2020-04-01,0
+San Andrés y Providencia,2020-05-01,0
+San Andrés y Providencia,2020-06-01,0
+San Andrés y Providencia,2020-07-01,0
+San Andrés y Providencia,2020-08-01,0
+San Andrés y Providencia,2020-09-01,0
+San Andrés y Providencia,2020-10-01,0
+San Andrés y Providencia,2020-11-01,0
+San Andrés y Providencia,2020-12-01,0
+San Andrés y Providencia,2021-01-01,0
+San Andrés y Providencia,2021-02-01,0
+San Andrés y Providencia,2021-03-01,0
+San Andrés y Providencia,2021-04-01,0
+San Andrés y Providencia,2021-05-01,0
+San Andrés y Providencia,2021-06-01,0
+San Andrés y Providencia,2021-07-01,0
+San Andrés y Providencia,2021-08-01,0
+San Andrés y Providencia,2021-09-01,0
+San Andrés y Providencia,2021-10-01,0
+San Andrés y Providencia,2021-11-01,0
+San Andrés y Providencia,2021-12-01,0
+San Andrés y Providencia,2022-01-01,0
+San Andrés y Providencia,2022-02-01,0
+San Andrés y Providencia,2022-03-01,0
+San Andrés y Providencia,2022-04-01,0
+San Andrés y Providencia,2022-05-01,0
+San Andrés y Providencia,2022-06-01,0
+San Andrés y Providencia,2022-07-01,0
+San Andrés y Providencia,2022-08-01,0
+San Andrés y Providencia,2022-09-01,0
+San Andrés y Providencia,2022-10-01,0
+San Andrés y Providencia,2022-11-01,0
+San Andrés y Providencia,2022-12-01,0
+San Andrés y Providencia,2023-01-01,0
+San Andrés y Providencia,2023-02-01,0
+San Andrés y Providencia,2023-03-01,100
+San Andrés y Providencia,2023-04-01,0
+San Andrés y Providencia,2023-05-01,0
+San Andrés y Providencia,2023-06-01,0
+San Andrés y Providencia,2023-07-01,0
+San Andrés y Providencia,2023-08-01,0
+San Andrés y Providencia,2023-09-01,0
+San Andrés y Providencia,2023-10-01,0
+San Andrés y Providencia,2023-11-01,0
+San Andrés y Providencia,2023-12-01,0
+San Andrés y Providencia,2024-01-01,0
+San Andrés y Providencia,2024-02-01,0
+San Andrés y Providencia,2024-03-01,0
+San Andrés y Providencia,2024-04-01,0
+San Andrés y Providencia,2024-05-01,0
+San Andrés y Providencia,2024-06-01,0
+San Andrés y Providencia,2024-07-01,0
+San Andrés y Providencia,2024-08-01,0
+San Andrés y Providencia,2024-09-01,0
+San Andrés y Providencia,2024-10-01,0
+San Andrés y Providencia,2024-11-01,0
+San Andrés y Providencia,2024-12-01,0
+San Andrés y Providencia,2025-01-01,0
+San Andrés y Providencia,2025-02-01,0
+San Andrés y Providencia,2025-03-01,0
+San Andrés y Providencia,2025-04-01,0
+San Andrés y Providencia,2025-05-01,0
+San Andrés y Providencia,2025-06-01,0
+San Andrés y Providencia,2025-07-01,0
+San Andrés y Providencia,2025-08-01,0
+San Andrés y Providencia,2025-09-01,0
+San Andrés y Providencia,2025-10-01,0
+San Andrés y Providencia,2025-11-01,0
+San Andrés y Providencia,2025-12-01,0

@@ -4,7 +4,7 @@
 # desde datos imputados (nacional + por departamento + por grupo etario)
 #
 # Corrección Tabla 2 (#1):
-#   - 33 códigos DIVIPOLA (32 departamentos + Bogotá D.C.) x 314 semanas.
+#   - 33 códigos DIVIPOLA (32 departamentos + Bogotá D.C.) x 313 semanas MMWR.
 #   - expand_grid() + left_join() + replace_na(0) para hacer explícitos
 #     los ceros. No se usa unique() para construir la rejilla.
 #   - El código 01 (EXTERIOR, no DIVIPOLA) se conserva como serie aparte
@@ -18,14 +18,14 @@ suppressPackageStartupMessages({
   library(scales)
 })
 
-dengue_imp      <- readRDS(here("data", "imputed", "dengue_imputado.rds"))
-chikungunya_imp <- readRDS(here("data", "imputed", "chikungunya_imputado.rds"))
+dengue_imp      <- readRDS(here("data", "D_06", "dengue_imputado.rds"))
+chikungunya_imp <- readRDS(here("data", "D_06", "chikungunya_imputado.rds"))
 
-dir.create(here("data", "series"), recursive = TRUE, showWarnings = FALSE)
-dir.create(here("graficas", "series"), recursive = TRUE, showWarnings = FALSE)
+dir.create(here("data", "D_07"), recursive = TRUE, showWarnings = FALSE)
+dir.create(here("graficas", "G_07"), recursive = TRUE, showWarnings = FALSE)
 
 # ============================================================
-# 0. Rejilla temporal: 33 códigos DIVIPOLA x 314 semanas
+# 0. Rejilla temporal: 33 códigos DIVIPOLA x 313 semanas MMWR
 # ============================================================
 
 # 32 departamentos + Bogotá D.C. (11). El código 01 no es DIVIPOLA:
@@ -38,23 +38,35 @@ codigos_divipola <- c(
 )
 stopifnot(length(codigos_divipola) == 33L, !anyDuplicated(codigos_divipola))
 
-# Semanas ISO/MMWR presentes en el calendario del proyecto:
-# 2020 y 2025 tienen 53 semanas; 2021-2024 tienen 52. Total = 314.
+# Semanas MMWR del periodo: 2020 tiene 53; 2021-2025 tienen 52. Total = 313.
 semanas_por_anio <- tibble(
   anio      = 2020:2025,
-  n_semanas = c(53L, 52L, 52L, 52L, 52L, 53L)
+  n_semanas = c(53L, 52L, 52L, 52L, 52L, 52L)
 )
+
+# Fecha de inicio (domingo) de la semana MMWR: la semana 1 es la que
+# contiene el 4 de enero y las semanas empiezan en domingo.
+fecha_mmwr <- function(anio, semana) {
+  ancla  <- as.Date(paste0(anio, "-01-04"))
+  inicio <- ancla - as.integer(format(ancla, "%w"))
+  inicio + (semana - 1) * 7
+}
+
+# 2025 no tiene semana 53 en el calendario MMWR: sus casos se suman a la 52.
+recode_semana <- function(anio, semana) {
+  dplyr::if_else(anio == 2025L & semana == 53L, 52L, semana)
+}
 
 calendario_semanal <- expand_grid(anio = 2020:2025, semana = 1:53) %>%
   left_join(semanas_por_anio, by = "anio") %>%
   filter(semana <= n_semanas) %>%
   mutate(
-    fecha_sem = as.Date(paste0(anio, "-01-01")) + (semana - 1) * 7
+    fecha_sem = fecha_mmwr(anio, semana)
   ) %>%
-  select(anio, semana, fecha_sem) %>%
+  dplyr::select(anio, semana, fecha_sem) %>%
   arrange(anio, semana)
 
-stopifnot(nrow(calendario_semanal) == 314L)
+stopifnot(nrow(calendario_semanal) == 313L)
 
 cat("\n===== REJILLA TEMPORAL =====\n")
 cat("Semanas del calendario:", nrow(calendario_semanal), "\n")
@@ -82,7 +94,11 @@ construir_serie <- function(df, nombre_evento) {
   df_serie <- df %>%
     mutate(
       anio_num   = as.integer(anio),
-      semana_num = as.integer(semana),
+      semana_num = as.integer(semana)
+    ) %>%
+    # 2025 no tiene semana 53: esos casos entran a la semana 52.
+    mutate(semana_num = recode_semana(anio_num, semana_num)) %>%
+    mutate(
       dpto       = as.character(.data[[col_dpto]]),
       grupo_edad = ifelse(!is.na(edad) & edad < 18, "Joven (0-17)",
                           ifelse(!is.na(edad), "Adulto (18+)", NA_character_))
@@ -90,11 +106,10 @@ construir_serie <- function(df, nombre_evento) {
     filter(!is.na(anio_num), !is.na(semana_num),
            anio_num >= 2020, anio_num <= 2025) %>%
     mutate(
-      fecha_sem = as.Date(paste0(anio_num, "-01-01")) +
-        (semana_num - 1) * 7
+      fecha_sem = fecha_mmwr(anio_num, semana_num)
     )
 
-  # --- Serie por departamento: 33 códigos DIVIPOLA x 314 semanas ---
+  # --- Serie por departamento: 33 códigos DIVIPOLA x 313 semanas MMWR ---
   conteos_dpto <- df_serie %>%
     filter(dpto %in% codigos_divipola) %>%
     count(dpto, anio = anio_num, semana = semana_num, name = "casos")
@@ -102,7 +117,7 @@ construir_serie <- function(df, nombre_evento) {
   serie_dpto <- expand_grid(dpto = codigos_divipola, calendario_semanal) %>%
     left_join(conteos_dpto, by = c("dpto", "anio", "semana")) %>%
     mutate(casos = tidyr::replace_na(casos, 0L)) %>%
-    select(dpto, anio, semana, fecha_sem, casos)
+    dplyr::select(dpto, anio, semana, fecha_sem, casos)
 
   # --- Serie EXTERIOR (código 01): se conserva fuera del panel DIVIPOLA ---
   conteos_exterior <- df_serie %>%
@@ -115,7 +130,7 @@ construir_serie <- function(df, nombre_evento) {
       dpto  = "EXTERIOR",
       casos = tidyr::replace_na(casos, 0L)
     ) %>%
-    select(dpto, anio, semana, fecha_sem, casos)
+    dplyr::select(dpto, anio, semana, fecha_sem, casos)
 
   # --- Serie nacional (incluye todos los códigos, también EXTERIOR) ---
   conteos_nacional <- df_serie %>%
@@ -127,7 +142,7 @@ construir_serie <- function(df, nombre_evento) {
       dpto  = "NACIONAL",
       casos = tidyr::replace_na(casos, 0L)
     ) %>%
-    select(dpto, anio, semana, fecha_sem, casos)
+    dplyr::select(dpto, anio, semana, fecha_sem, casos)
 
   # --- Serie por grupo etario (nacional), también con ceros explícitos ---
   conteos_edad <- df_serie %>%
@@ -143,7 +158,7 @@ construir_serie <- function(df, nombre_evento) {
       dpto  = paste0("NACIONAL_", grupo_edad),
       casos = tidyr::replace_na(casos, 0L)
     ) %>%
-    select(dpto, anio, semana, fecha_sem, casos)
+    dplyr::select(dpto, anio, semana, fecha_sem, casos)
 
   bind_rows(serie_dpto, serie_exterior, serie_nacional, serie_edad) %>%
     mutate(
@@ -164,15 +179,17 @@ validar_serie <- function(serie, nombre) {
   div <- serie %>% filter(dpto %in% codigos_divipola)
 
   stopifnot(n_distinct(div$dpto) == 33L)
-  stopifnot(nrow(div) == 33L * 314L)
-  stopifnot(all(count(div, dpto)$n == 314L))
-  stopifnot(nrow(filter(serie, dpto == "NACIONAL")) == 314L)
-  stopifnot(nrow(filter(serie, dpto == "EXTERIOR")) == 314L)
+  stopifnot(nrow(div) == 33L * 313L)
+  stopifnot(all(count(div, dpto)$n == 313L))
+  stopifnot(nrow(filter(serie, dpto == "NACIONAL")) == 313L)
+  stopifnot(nrow(filter(serie, dpto == "EXTERIOR")) == 313L)
   stopifnot(!anyNA(serie$casos), all(serie$casos >= 0))
 
   mensual <- serie %>%
     filter(dpto == "NACIONAL") %>%
-    mutate(mes = floor_date(fecha_sem, "month")) %>%
+    # La semana se asigna al mes de su jueves (criterio ISO): así la
+    # semana 1 cae en enero y la última en diciembre, sin crear 2019-12.
+    mutate(mes = floor_date(fecha_sem + 3, "month")) %>%
     group_by(mes) %>%
     summarise(casos = sum(casos, na.rm = TRUE), .groups = "drop") %>%
     arrange(mes)
@@ -180,7 +197,7 @@ validar_serie <- function(serie, nombre) {
   stopifnot(nrow(mensual) == 72L)
 
   cat("\n===== VALIDACIÓN:", nombre, "=====\n")
-  cat("Filas departamentales (33 x 314):", nrow(div), "\n")
+  cat("Filas departamentales (33 x 313):", nrow(div), "\n")
   cat("Semanas por departamento:", paste(range(count(div, dpto)$n), collapse = "-"), "\n")
   cat("Filas NACIONAL:", nrow(filter(serie, dpto == "NACIONAL")), "\n")
   cat("Meses nacionales:", nrow(mensual),
@@ -229,7 +246,11 @@ construir_serie_municipal <- function(df, nombre_evento) {
   df_serie <- df %>%
     mutate(
       anio_num   = as.integer(anio),
-      semana_num = as.integer(semana),
+      semana_num = as.integer(semana)
+    ) %>%
+    # 2025 no tiene semana 53: esos casos entran a la semana 52.
+    mutate(semana_num = recode_semana(anio_num, semana_num)) %>%
+    mutate(
       cod_dpto_o = str_pad(as.character(cod_dpto_o), 2, pad = "0"),
       cod_mun_o  = str_pad(as.character(cod_mun_o), 3, pad = "0"),
       cod_mun_o  = if_else(
@@ -263,7 +284,7 @@ construir_serie_municipal <- function(df, nombre_evento) {
   ) %>%
     left_join(conteos, by = c("cod_mun_o", "anio", "semana")) %>%
     mutate(casos = tidyr::replace_na(casos, 0L)) %>%
-    select(cod_mun_o, anio, semana, fecha_sem, casos) %>%
+    dplyr::select(cod_mun_o, anio, semana, fecha_sem, casos) %>%
     arrange(cod_mun_o, anio, semana)
 
   stopifnot(
@@ -291,25 +312,25 @@ serie_chik_municipal   <- construir_serie_municipal(chikungunya_imp, "Chikunguny
 # 3. Guardar
 # ============================================================
 
-saveRDS(serie_dengue, here("data", "series", "serie_dengue.rds"))
-saveRDS(serie_chik,   here("data", "series", "serie_chik.rds"))
+saveRDS(serie_dengue, here("data", "D_07", "serie_dengue.rds"))
+saveRDS(serie_chik,   here("data", "D_07", "serie_chik.rds"))
 
 # Nuevas series municipales (no reemplazan a las departamentales)
 if (!is.null(serie_dengue_municipal)) {
   saveRDS(
     serie_dengue_municipal,
-    here("data", "series", "serie_dengue_municipal.rds")
+    here("data", "D_07", "serie_dengue_municipal.rds")
   )
 }
 if (!is.null(serie_chik_municipal)) {
   saveRDS(
     serie_chik_municipal,
-    here("data", "series", "serie_chik_municipal.rds")
+    here("data", "D_07", "serie_chik_municipal.rds")
   )
 }
 
-write.csv(serie_dengue, here("data", "series", "serie_dengue.csv"), row.names = FALSE)
-write.csv(serie_chik,   here("data", "series", "serie_chik.csv"),   row.names = FALSE)
+write.csv(serie_dengue, here("data", "D_07", "serie_dengue.csv"), row.names = FALSE)
+write.csv(serie_chik,   here("data", "D_07", "serie_chik.csv"),   row.names = FALSE)
 
 # ============================================================
 # 4. Gráfico exploratorio nacional
@@ -336,10 +357,17 @@ p_c <- grafico_serie(serie_chik,   "Chikungunya", "#B2182B")
 
 print(p_d); print(p_c)
 
-ggsave(here("graficas", "series", "serie_nacional_dengue.png"),
+ggsave(here("graficas", "G_07", "serie_nacional_dengue.png"),
        p_d, width = 10, height = 4, dpi = 150, bg = "white")
-ggsave(here("graficas", "series", "serie_nacional_chikungunya.png"),
+ggsave(here("graficas", "G_07", "serie_nacional_chikungunya.png"),
        p_c, width = 10, height = 4, dpi = 150, bg = "white")
 
-cat("\n✅ Series guardadas en data/series/\n")
+cat("\n✅ Series guardadas en data/D_07/\n")
+
+message(
+  "\nCalendario MMWR y 313 semanas aplicados. Las fechas de esta serie ",
+  "cambiaron respecto a la versión de 314 semanas: vuelve a correr los ",
+  "scripts 08 a 13 para regenerar tasas, panel y resultados con el ",
+  "calendario corregido."
+)
 

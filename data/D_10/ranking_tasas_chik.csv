@@ -1,0 +1,13 @@
+posicion,periodo,region_ema,casos,poblacion_promedio,tasa_acumulada
+1,2020-2025,Región Amazonía,63,1062721,5.93
+2,2020-2025,Región Central,102,7164981,1.42
+3,2020-2025,Región Eje Cafetero,32,2584367,1.24
+4,2020-2025,Región Santanderes,46,4013043,1.15
+5,2020-2025,Región Llanos Orinoquía,21,1991705,1.05
+6,2020-2025,Región Pacífico,86,8481946,1.01
+7,2020-2025,Cartagena,9,1006463,0.89
+8,2020-2025,Antioquia,25,6795960,0.37
+9,2020-2025,Golfo Morrosquillo y Sabana,12,4118654,0.29
+10,2020-2025,Región Costa Caribe,15,6687441,0.22
+11,2020-2025,Bogotá D.C.,2,7852858,0.03
+12,2020-2025,San Andrés y Providencia,0,62866,0

@@ -10,8 +10,8 @@ library(mice)
 library(scales)
 
 # --- Cargar datos ---
-dengue      <- readRDS(here("data", "processed", "dengue_prep.rds"))
-chikungunya <- readRDS(here("data", "processed", "chikungunya_prep.rds"))
+dengue      <- readRDS(here("data", "D_02", "dengue_prep.rds"))
+chikungunya <- readRDS(here("data", "D_02", "chikungunya_prep.rds"))
 
 # ============================================================
 # 0. VERIFICACIÓN DE NA ESTRUCTURALES
@@ -38,7 +38,7 @@ verificar_estructurales <- function(df, nombre) {
       variable_original = sub("^na_estructural_", "", variable_estructural),
       pct = round(n_estructural / nrow(df) * 100, 2)
     ) %>%
-    select(-variable_estructural) %>%
+    dplyr::select(-variable_estructural) %>%
     arrange(desc(pct)) %>%
     as.data.frame() %>%
     print(row.names = FALSE)
@@ -52,7 +52,7 @@ verificar_estructurales(chikungunya, "CHIKUNGUNYA")
 # ============================================================
 
 clasificar_celdas <- function(df) {
-  df_analisis <- df %>% select(-starts_with("na_estructural_"))
+  df_analisis <- df %>% dplyr::select(-starts_with("na_estructural_"))
   vars_analisis <- names(df_analisis)
   
   estados <- df_analisis %>%
@@ -92,7 +92,7 @@ asignar_categoria <- function(variable, categorias = categorias_vars) {
 # ============================================================
 
 resumen_faltantes <- function(df, nombre) {
-  df_analisis <- df %>% select(-starts_with("na_estructural_"))
+  df_analisis <- df %>% dplyr::select(-starts_with("na_estructural_"))
   
   na_total <- df_analisis %>%
     summarise(across(everything(), ~ sum(is.na(.)))) %>%
@@ -230,7 +230,7 @@ mapa_faltantes_completo <- function(df, nombre_evento, categoria_filtro) {
     arrange(desc(pct_faltante), desc(pct_no_aplica))
   
   df_long <- resumen %>%
-    select(variable, pct_presente, pct_faltante, pct_no_aplica) %>%
+    dplyr::select(variable, pct_presente, pct_faltante, pct_no_aplica) %>%
     pivot_longer(cols = starts_with("pct_"), names_to = "estado", values_to = "pct") %>%
     mutate(
       estado   = factor(sub("^pct_", "", estado), levels = c("presente", "faltante", "no_aplica")),
@@ -270,7 +270,7 @@ mapa_faltantes_completo <- function(df, nombre_evento, categoria_filtro) {
 # 4. EJECUCIÓN DEL BUCLE PRINCIPAL
 # ============================================================
 
-dir.create("graficas/faltantes", recursive = TRUE, showWarnings = FALSE)
+dir.create(here("graficas", "G_05"), recursive = TRUE, showWarnings = FALSE)
 
 for (evento in c("dengue", "chikungunya")) {
   df_evt <- get(evento)
@@ -288,7 +288,7 @@ for (evento in c("dengue", "chikungunya")) {
     if (!is.null(p1)) {
       print(p1)
       ggsave(
-        file.path("graficas/faltantes", paste0("patron_md_", evento, "_", cat_actual, ".png")),
+        here("graficas", "G_05", paste0("patron_md_", evento, "_", cat_actual, ".png")),
         plot = p1,
         width = max(7, 0.8 * n_vars_cat + 3),
         height = max(4, 0.25 * nrow(unique(clasificar_celdas(df_evt)[, vars_cat, drop = FALSE])) + 3),
@@ -300,7 +300,7 @@ for (evento in c("dengue", "chikungunya")) {
     if (!is.null(p2)) {
       print(p2)
       ggsave(
-        file.path("graficas/faltantes", paste0("mapa_", evento, "_", cat_actual, ".png")),
+        here("graficas", "G_05", paste0("mapa_", evento, "_", cat_actual, ".png")),
         plot = p2,
         width = 9,
         height = max(4, 0.3 * n_vars_cat + 2),
@@ -324,7 +324,7 @@ patron_por_categoria <- function(df, nombre) {
     vars_cat <- intersect(categorias_vars[[cat_nombre]], names(estados))
     if (length(vars_cat) == 0) next
     
-    sub_estados <- estados %>% select(all_of(vars_cat))
+    sub_estados <- estados %>% dplyr::select(all_of(vars_cat))
     
     resultados[[cat_nombre]] <- tibble(
       categoria = cat_nombre,
@@ -354,7 +354,7 @@ patron_chik   <- patron_por_categoria(chikungunya, "Chikungunya")
 
 patrones_reales <- function(df, nombre) {
   estados <- clasificar_celdas(df) %>%
-    select(-any_of(c("consecutive", "cod_eve", "nombre_evento",
+    dplyr::select(-any_of(c("consecutive", "cod_eve", "nombre_evento",
                      "evento", "va_sispro", "ano")))
   
   mat <- as.data.frame(lapply(estados, function(x) as.integer(x == "faltante")))
@@ -402,7 +402,7 @@ diagnostico <- function(falt_resumen, nombre) {
     falt_resumen %>%
       filter(pct_real > 0) %>%
       arrange(desc(pct_real)) %>%
-      select(variable, pct_real, categoria) %>%
+      dplyr::select(variable, pct_real, categoria) %>%
       as.data.frame(),
     row.names = FALSE
   )
@@ -459,7 +459,7 @@ diagnostico_basico <- function(df, nombre) {
 test_mcar_seguro <- function(df, nombre, n_max = 5000) {
   
   df_analisis <- df %>%
-    select(-starts_with("na_estructural_")) %>%
+    dplyr::select(-starts_with("na_estructural_")) %>%
     mutate(across(where(is.character), as.factor))
   
   if (nrow(df_analisis) > n_max) {
@@ -467,7 +467,7 @@ test_mcar_seguro <- function(df, nombre, n_max = 5000) {
     df_analisis <- df_analisis %>% slice_sample(n = n_max)
   }
   
-  df_analisis <- df_analisis %>% select(where(~ any(is.na(.))))
+  df_analisis <- df_analisis %>% dplyr::select(where(~ any(is.na(.))))
   
   if (ncol(df_analisis) < 2) return(NULL)
   
@@ -650,7 +650,7 @@ cat("=========================================================\n")
 print(as.data.frame(tabla_resumen), row.names = FALSE)
 
 write.csv(tabla_resumen,
-          here("data", "processed", "diagnostico_imputacion.csv"),
+          here("data", "D_05", "diagnostico_imputacion.csv"),
           row.names = FALSE)
 
 cat("\n✅ Diagnóstico pre-imputación completado.\n")

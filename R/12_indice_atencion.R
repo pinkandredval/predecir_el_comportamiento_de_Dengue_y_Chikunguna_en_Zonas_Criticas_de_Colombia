@@ -88,7 +88,7 @@ if (length(faltan_mapeo) > 0) {
 }
 
 # --- 4. Carpeta de salida ---
-dir_trends <- here("data", "trends")
+dir_trends <- here("data", "D_12")
 if (!dir.exists(dir_trends)) {
   dir.create(dir_trends, recursive = TRUE)
 }
@@ -279,30 +279,31 @@ atencion_dengue <- construir_atencion(archivos_dengue, mapeo_ema)
 atencion_chik <- construir_atencion(archivos_chik, mapeo_ema)
 
 if (nrow(atencion_dengue) > 0) {
-  ruta_atencion <- here("data", "trends", "atencion_dengue_EMA.csv")
+  ruta_atencion <- here("data", "D_12", "atencion_dengue_EMA.csv")
   write_csv(atencion_dengue, ruta_atencion)
   # Se relee el archivo guardado para el cálculo del miedo excedente.
   atencion_dengue <- read_csv(ruta_atencion, show_col_types = FALSE)
 }
 
 if (nrow(atencion_chik) > 0) {
-  write_csv(
-    atencion_chik,
-    here("data", "trends", "atencion_chikungunya_EMA.csv")
-  )
+  ruta_atencion_chik <- here("data", "D_12", "atencion_chikungunya_EMA.csv")
+  write_csv(atencion_chik, ruta_atencion_chik)
+  # Se relee el archivo guardado para el cálculo del miedo excedente.
+  atencion_chik <- read_csv(ruta_atencion_chik, show_col_types = FALSE)
 }
 
-# --- 9. Incidencia mensual de dengue por región EMA ---
-# La serie de tasas viene a nivel municipal-semanal: se suman los casos de
-# los municipios de cada región y se agregan por mes.
+# --- 9. Incidencia mensual por región EMA ---
+# Las series vienen a nivel municipal-semanal: se suman los casos de los
+# municipios de cada región y se agregan por mes.
 leer_incidencia <- function(ruta) {
   read_csv(ruta, show_col_types = FALSE) |>
-    mutate(mes = floor_date(fecha_sem, "month")) |>
+    mutate(mes = floor_date(fecha_sem + 3, "month")) |>  # jueves de la semana (ISO)
     group_by(region_ema, mes) |>
     summarise(casos = sum(casos, na.rm = TRUE), .groups = "drop")
 }
 
-ruta_incidencia <- here("data", "series", "serie_dengue_tasas.csv")
+ruta_incidencia_dengue <- here("data", "D_10", "serie_dengue_tasas.csv")
+ruta_incidencia_chik <- here("data", "D_10", "serie_chik_tasas.csv")
 
 # --- 10. Miedo excedente: regresión auxiliar por región ---
 # A_t = b0 + b1*Casos_{t-1} + b2*Casos_{t-2} + b3*Casos_{t-3}
@@ -361,34 +362,59 @@ calcular_miedo <- function(atencion, incidencia) {
   )
 }
 
-r2_tabla <- tibble(region_ema = character(), r2 = numeric())
+# Calcula y guarda el miedo excedente de una enfermedad.
+# Devuelve la tabla de R-cuadrado (vacía si no hay datos).
+procesar_miedo <- function(atencion, ruta_incidencia, ruta_salida, etiqueta) {
+  if (nrow(atencion) == 0) {
+    warning(
+      "No hay datos de atención de ", etiqueta,
+      "; no se calcula su miedo excedente.",
+      call. = FALSE
+    )
+    return(tibble(region_ema = character(), r2 = numeric()))
+  }
 
-if (nrow(atencion_dengue) > 0 && file.exists(ruta_incidencia)) {
-  incidencia <- leer_incidencia(ruta_incidencia)
-  resultado_miedo <- calcular_miedo(atencion_dengue, incidencia)
+  if (!file.exists(ruta_incidencia)) {
+    warning(
+      "No se encontró ", ruta_incidencia,
+      "; no se calcula el miedo excedente de ", etiqueta, ".",
+      call. = FALSE
+    )
+    return(tibble(region_ema = character(), r2 = numeric()))
+  }
 
-  write_csv(
-    resultado_miedo$datos,
-    here("data", "trends", "miedo_excedente_EMA.csv")
-  )
+  resultado <- calcular_miedo(atencion, leer_incidencia(ruta_incidencia))
+  write_csv(resultado$datos, ruta_salida)
 
-  r2_tabla <- resultado_miedo$r2
-} else if (nrow(atencion_dengue) == 0) {
-  warning(
-    "No hay datos de atención para construir el miedo excedente.",
-    call. = FALSE
-  )
-} else {
-  warning(
-    "No se encontró ", ruta_incidencia,
-    "; no se puede calcular el miedo excedente.",
-    call. = FALSE
-  )
+  resultado$r2
 }
 
-# --- 11. R-cuadrado de la regresión auxiliar ---
-if (nrow(r2_tabla) > 0) {
-  cat("\n=== R-cuadrado de la regresión auxiliar por región ===\n")
+r2_dengue <- procesar_miedo(
+  atencion = atencion_dengue,
+  ruta_incidencia = ruta_incidencia_dengue,
+  ruta_salida = here("data", "D_12", "miedo_excedente_EMA.csv"),
+  etiqueta = "dengue"
+)
+
+r2_chik <- procesar_miedo(
+  atencion = atencion_chik,
+  ruta_incidencia = ruta_incidencia_chik,
+  ruta_salida = here("data", "D_12", "miedo_excedente_chik_EMA.csv"),
+  etiqueta = "chikungunya"
+)
+
+# --- 11. R-cuadrado de las regresiones auxiliares ---
+imprimir_r2 <- function(r2_tabla, etiqueta) {
+  cat(
+    "\n=== R-cuadrado de la regresión auxiliar: ", etiqueta, " ===\n",
+    sep = ""
+  )
+
+  if (nrow(r2_tabla) == 0) {
+    cat("No disponible: no hay datos de atención e incidencia para estimar.\n")
+    return(invisible(NULL))
+  }
+
   print(as.data.frame(r2_tabla), row.names = FALSE)
 
   media_r2 <- mean(r2_tabla$r2, na.rm = TRUE)
@@ -400,9 +426,9 @@ if (nrow(r2_tabla) > 0) {
   } else {
     cat("R-cuadrado promedio: no disponible\n")
   }
-} else {
-  cat("\n=== R-cuadrado de la regresión auxiliar ===\n")
-  cat("No disponible: no hay datos de atención e incidencia para estimar.\n")
 }
+
+imprimir_r2(r2_dengue, "dengue")
+imprimir_r2(r2_chik, "chikungunya")
 
 message("✅ Proceso finalizado.")

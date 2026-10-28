@@ -9,8 +9,8 @@ library(janitor)
 library(scales)   # para comma() y label_number()
 
 # --- Cargar datos preparados ---
-dengue      <- readRDS(here("data", "processed", "dengue_prep.rds"))
-chikungunya <- readRDS(here("data", "processed", "chikungunya_prep.rds"))
+dengue      <- readRDS(here("data", "D_02", "dengue_prep.rds"))
+chikungunya <- readRDS(here("data", "D_02", "chikungunya_prep.rds"))
 
 # ============================================================
 # 1. DIMENSIONES
@@ -25,10 +25,10 @@ cat("Chikungunya:", nrow(chikungunya), "filas x", ncol(chikungunya), "columnas\n
 # ============================================================
 
 cat("\n===== SUMMARY DENGUE (numéricas) =====\n")
-print(summary(dengue %>% select(edad, semana, anio)))
+print(summary(dengue %>% dplyr::select(edad, semana, anio)))
 
 cat("\n===== SUMMARY CHIKUNGUNYA (numéricas) =====\n")
-print(summary(chikungunya %>% select(edad, semana, anio)))
+print(summary(chikungunya %>% dplyr::select(edad, semana, anio)))
 
 resumen_var <- function(df, var, nombre_evento) {
   x <- df[[var]]
@@ -85,8 +85,8 @@ frecuencias(chikungunya, vars_cat, "CHIKUNGUNYA")
 
 columnas_comunes <- intersect(names(dengue), names(chikungunya))
 datos_comp <- bind_rows(
-  dengue      %>% select(all_of(columnas_comunes)),
-  chikungunya %>% select(all_of(columnas_comunes))
+  dengue      %>% dplyr::select(all_of(columnas_comunes)),
+  chikungunya %>% dplyr::select(all_of(columnas_comunes))
 )
 
 cat("\n===== RESUMEN COMPARATIVO POR EVENTO =====\n")

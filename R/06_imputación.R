@@ -18,10 +18,10 @@ suppressPackageStartupMessages({
 })
 
 # --- Cargar datos preparados ---
-dengue      <- readRDS(here("data", "processed", "dengue_prep.rds"))
-chikungunya <- readRDS(here("data", "processed", "chikungunya_prep.rds"))
+dengue      <- readRDS(here("data", "D_02", "dengue_prep.rds"))
+chikungunya <- readRDS(here("data", "D_02", "chikungunya_prep.rds"))
 
-dir.create(here("data", "imputed"),
+dir.create(here("data", "D_06"),
            recursive = TRUE, showWarnings = FALSE)
 
 # ============================================================
@@ -29,7 +29,7 @@ dir.create(here("data", "imputed"),
 # ============================================================
 
 clasificar_celdas <- function(df) {
-  df_analisis <- df %>% select(-starts_with("na_estructural_"))
+  df_analisis <- df %>% dplyr::select(-starts_with("na_estructural_"))
   vars_analisis <- names(df_analisis)
   
   estados <- df_analisis %>%
@@ -120,7 +120,7 @@ preparar_para_imputar <- function(df, vars_imputar) {
   estados <- clasificar_celdas(df)
   
   df_imp <- df %>%
-    select(all_of(vars_imputar)) %>%
+    dplyr::select(all_of(vars_imputar)) %>%
     mutate(across(where(is.character), as.factor))
   
   mask_no_aplica <- list()
@@ -354,22 +354,22 @@ chikungunya_final <- reconstruir_df(chikungunya, res_chik$df_imputado,
 
 # Data frames finales (con variables imputadas + banderas)
 saveRDS(dengue_final,
-        here("data", "imputed", "dengue_imputado.rds"))
+        here("data", "D_06", "dengue_imputado.rds"))
 saveRDS(chikungunya_final,
-        here("data", "imputed", "chikungunya_imputado.rds"))
+        here("data", "D_06", "chikungunya_imputado.rds"))
 
 # Objetos mids (por si quieres pooling después)
 saveRDS(res_dengue$imp,
-        here("data", "imputed", "dengue_mice_mids.rds"))
+        here("data", "D_06", "dengue_mice_mids.rds"))
 saveRDS(res_chik$imp,
-        here("data", "imputed", "chikungunya_mice_mids.rds"))
+        here("data", "D_06", "chikungunya_mice_mids.rds"))
 
 # Tablas de comparación NA antes/después
 write.csv(res_dengue$comparacion,
-          here("data", "imputed", "comparacion_na_dengue.csv"),
+          here("data", "D_06", "comparacion_na_dengue.csv"),
           row.names = FALSE)
 write.csv(res_chik$comparacion,
-          here("data", "imputed", "comparacion_na_chikungunya.csv"),
+          here("data", "D_06", "comparacion_na_chikungunya.csv"),
           row.names = FALSE)
 
 # ============================================================
@@ -389,7 +389,7 @@ diagnostico_imputacion <- function(df_orig, df_final, nombre, res) {
   na_orig  <- sum(sapply(estados_orig, function(x) sum(x == "faltante")))
   
   cols_data <- df_final %>%
-    select(-starts_with("na_estructural_"), -starts_with("imputado_"))
+    dplyr::select(-starts_with("na_estructural_"), -starts_with("imputado_"))
   na_final <- sum(is.na(cols_data))
   
   cat("Celdas faltante real (original): ", comma(na_orig), "\n")
@@ -416,7 +416,7 @@ cat("\n")
 cat("=========================================================\n")
 cat("✅ IMPUTACIÓN COMPLETADA\n")
 cat("=========================================================\n")
-cat("Archivos en data/imputed/:\n")
+cat("Archivos en data/D_06/:\n")
 cat("  - dengue_imputado.rds\n")
 cat("  - chikungunya_imputado.rds\n")
 cat("  - dengue_mice_mids.rds        (objeto mids para pooling)\n")

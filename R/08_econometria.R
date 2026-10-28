@@ -21,10 +21,11 @@ suppressPackageStartupMessages({
   library(scales)
 })
 
-serie_dengue <- readRDS(here("data", "series", "serie_dengue.rds"))
-serie_chik   <- readRDS(here("data", "series", "serie_chik.rds"))
+serie_dengue <- readRDS(here("data", "D_07", "serie_dengue.rds"))
+serie_chik   <- readRDS(here("data", "D_07", "serie_chik.rds"))
 
-dir.create(here("graficas", "econometria"), recursive = TRUE, showWarnings = FALSE)
+dir.create(here("data", "D_08"), recursive = TRUE, showWarnings = FALSE)
+dir.create(here("graficas", "G_08"), recursive = TRUE, showWarnings = FALSE)
 
 # ============================================================
 # 1. Serie mensual nacional (rejilla completa, 72 meses)
@@ -33,7 +34,7 @@ dir.create(here("graficas", "econometria"), recursive = TRUE, showWarnings = FAL
 preparar_mensual <- function(serie) {
   serie %>%
     filter(dpto == "NACIONAL") %>%
-    mutate(mes = floor_date(fecha_sem, "month")) %>%
+    mutate(mes = floor_date(fecha_sem + 3, "month")) %>%  # jueves de la semana (ISO)
     group_by(mes) %>%
     summarise(casos = sum(casos, na.rm = TRUE), .groups = "drop") %>%
     complete(mes = seq(min(mes), max(mes), by = "month"),
@@ -143,15 +144,15 @@ analisis_econometrico <- function(ts_serie, nombre, color = "#08519C") {
   p_subserie <- ggsubseriesplot(ts_bc) +
     labs(title = paste0("Subseries plot — ", nombre))
 
-  ggsave(here("graficas", "econometria",
+  ggsave(here("graficas", "G_08",
               paste0("seasonplot_", tolower(nombre), ".png")),
          p_season, width = 9, height = 5, dpi = 150, bg = "white")
-  ggsave(here("graficas", "econometria",
+  ggsave(here("graficas", "G_08",
               paste0("subseries_", tolower(nombre), ".png")),
          p_subserie, width = 9, height = 5, dpi = 150, bg = "white")
 
   # --- ACF/PACF ---
-  png(here("graficas", "econometria",
+  png(here("graficas", "G_08",
            paste0("acf_pacf_", tolower(nombre), ".png")),
       width = 1200, height = 500, res = 150)
   par(mfrow = c(1, 2))
@@ -248,7 +249,7 @@ analisis_econometrico <- function(ts_serie, nombre, color = "#08519C") {
   forecast_sarima$lower[forecast_sarima$lower < 0] <- 0
   forecast_sarima$upper[forecast_sarima$upper < 0] <- 0
 
-  png(here("graficas", "econometria",
+  png(here("graficas", "G_08",
            paste0("forecast_", tolower(nombre), ".png")),
       width = 1200, height = 600, res = 150)
   plot(forecast_sarima,
@@ -293,6 +294,6 @@ res_econ_chik   <- analisis_econometrico(ts_chik,   "Chikungunya", "#B2182B")
 # ============================================================
 
 saveRDS(list(dengue = res_econ_dengue, chik = res_econ_chik),
-        here("data", "series", "econometria_sarima.rds"))
+        here("data", "D_08", "econometria_sarima.rds"))
 
 cat("\n✅ Análisis econométrico completado\n")

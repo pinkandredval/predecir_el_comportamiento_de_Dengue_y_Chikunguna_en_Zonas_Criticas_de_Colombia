@@ -6,8 +6,8 @@
 #
 # CASOS
 # Series municipales generadas por 07_serietemporal_conimputacion.R:
-#   data/series/serie_dengue_municipal.rds
-#   data/series/serie_chik_municipal.rds
+#   data/D_07/serie_dengue_municipal.rds
+#   data/D_07/serie_chik_municipal.rds
 # columnas: cod_mun_o (DIVIPOLA de 5 dígitos), anio, semana, fecha_sem, casos.
 #
 # POBLACIÓN
@@ -34,14 +34,15 @@ library(here)
 
 # --- 0. Rutas -----------------------------------------------------
 
-ruta_series <- here("data", "series")
+ruta_series <- here("data", "D_10")
 ruta_graficas <- here("graficas")
 
 dir.create(ruta_series, showWarnings = FALSE, recursive = TRUE)
 dir.create(ruta_graficas, showWarnings = FALSE, recursive = TRUE)
+dir.create(here("graficas", "G_10"), showWarnings = FALSE, recursive = TRUE)
 
-ruta_dengue_mun <- here("data", "series", "serie_dengue_municipal.rds")
-ruta_chik_mun <- here("data", "series", "serie_chik_municipal.rds")
+ruta_dengue_mun <- here("data", "D_07", "serie_dengue_municipal.rds")
+ruta_chik_mun <- here("data", "D_07", "serie_chik_municipal.rds")
 
 ruta_pob_mun <- here(
   "data", "raw", "proyecciones_dane_2018-2042",
@@ -383,7 +384,7 @@ procesar_serie_municipal <- function(serie, nombre) {
     mutate(
       tasa = casos / poblacion_region * 100000
     ) |>
-    select(
+    dplyr::select(
       cod_mun_o, anio, semana, fecha_sem, casos,
       region_ema, poblacion_region, tasa
     ) |>
@@ -415,7 +416,7 @@ ranking_dengue <- tibble(region_ema = regiones_ema) |>
     posicion = row_number(),
     periodo = "2020-2025"
   ) |>
-  select(
+  dplyr::select(
     posicion, periodo, region_ema,
     casos, poblacion_promedio, tasa_acumulada
   )
@@ -433,33 +434,75 @@ ranking_csv <- ranking_dengue |>
     tasa_acumulada = round(tasa_acumulada, 2)
   )
 
+# Ranking equivalente para chikungunya.
+casos_region_chik <- chik_tasas |>
+  group_by(region_ema) |>
+  summarise(casos = sum(casos, na.rm = TRUE), .groups = "drop")
+
+ranking_chik <- tibble(region_ema = regiones_ema) |>
+  left_join(casos_region_chik, by = "region_ema") |>
+  mutate(casos = tidyr::replace_na(casos, 0L)) |>
+  left_join(poblacion_region_promedio, by = "region_ema") |>
+  mutate(
+    tasa_acumulada = casos / poblacion_promedio * 100000
+  ) |>
+  arrange(desc(tasa_acumulada)) |>
+  mutate(
+    posicion = row_number(),
+    periodo = "2020-2025"
+  ) |>
+  dplyr::select(
+    posicion, periodo, region_ema,
+    casos, poblacion_promedio, tasa_acumulada
+  )
+
+if (anyNA(ranking_chik$tasa_acumulada)) {
+  warning(
+    "Hay regiones sin población promedio para chikungunya; revise la ",
+    "cobertura municipal.",
+    call. = FALSE
+  )
+}
+
+ranking_chik_csv <- ranking_chik |>
+  mutate(
+    poblacion_promedio = round(poblacion_promedio),
+    tasa_acumulada = round(tasa_acumulada, 2)
+  )
+
 # --- 7. Guardar CSV -----------------------------------------------
 
 write_csv(
   dengue_tasas |> mutate(tasa = round(tasa, 4)),
-  here("data", "series", "serie_dengue_tasas.csv")
+  here("data", "D_10", "serie_dengue_tasas.csv")
 )
 
 write_csv(
   chik_tasas |> mutate(tasa = round(tasa, 4)),
-  here("data", "series", "serie_chik_tasas.csv")
+  here("data", "D_10", "serie_chik_tasas.csv")
 )
 
 write_csv(
   ranking_csv,
-  here("data", "series", "ranking_tasas_dengue.csv")
+  here("data", "D_10", "ranking_tasas_dengue.csv")
+)
+
+write_csv(
+  ranking_chik_csv,
+  here("data", "D_10", "ranking_tasas_chik.csv")
 )
 
 message(
   "CSV guardados: serie_dengue_tasas.csv (", nrow(dengue_tasas), " filas), ",
   "serie_chik_tasas.csv (", nrow(chik_tasas), " filas), ",
-  "ranking_tasas_dengue.csv (", nrow(ranking_csv), " filas)."
+  "ranking_tasas_dengue.csv (", nrow(ranking_csv), " filas), ",
+  "ranking_tasas_chik.csv (", nrow(ranking_chik_csv), " filas)."
 )
 
 # --- 8. Top 12 en consola -----------------------------------------
 
 ranking_consola <- ranking_csv |>
-  select(posicion, region_ema, casos, poblacion_promedio, tasa_acumulada)
+  dplyr::select(posicion, region_ema, casos, poblacion_promedio, tasa_acumulada)
 
 cat("\n--- Top 12 regiones EMA por tasa acumulada (2020-2025) ---\n")
 cat(sprintf(
@@ -480,6 +523,33 @@ cat(sprintf(
   ),
   formatC(
     ranking_consola$tasa_acumulada,
+    format = "f", digits = 2, big.mark = ".", decimal.mark = ","
+  )
+))
+cat("\n")
+
+ranking_chik_consola <- ranking_chik_csv |>
+  dplyr::select(posicion, region_ema, casos, poblacion_promedio, tasa_acumulada)
+
+cat("\n--- Top 12 regiones EMA por tasa acumulada de chikungunya (2020-2025) ---\n")
+cat(sprintf(
+  "%2s  %-34s  %9s  %12s  %11s\n",
+  "#", "REGIÓN EMA", "CASOS", "POBL. PROM.", "TASA"
+))
+cat(sprintf(
+  "%2d  %-34s  %9s  %12s  %11s\n",
+  ranking_chik_consola$posicion,
+  str_trunc(ranking_chik_consola$region_ema, 34),
+  formatC(
+    ranking_chik_consola$casos,
+    format = "d", big.mark = ".", decimal.mark = ","
+  ),
+  formatC(
+    ranking_chik_consola$poblacion_promedio,
+    format = "d", big.mark = ".", decimal.mark = ","
+  ),
+  formatC(
+    ranking_chik_consola$tasa_acumulada,
     format = "f", digits = 2, big.mark = ".", decimal.mark = ","
   )
 ))
@@ -557,7 +627,7 @@ p_ranking <- ggplot(
     plot.margin = margin(10, 20, 10, 10)
   )
 
-ruta_grafica <- here("graficas", "10_ranking_regiones.png")
+ruta_grafica <- here("graficas", "G_10", "10_ranking_regiones.png")
 
 if (requireNamespace("ragg", quietly = TRUE)) {
   ggsave(
@@ -580,5 +650,102 @@ if (requireNamespace("ragg", quietly = TRUE)) {
   )
 }
 
-message("Gráfico guardado en: ", ruta_grafica)
+message("Gráfico dengue guardado en: ", ruta_grafica)
+
+# --- 10. Gráfico de barras de chikungunya ------------------------
+
+datos_plot_chik <- ranking_chik |>
+  mutate(
+    region_ema = factor(
+      region_ema,
+      levels = region_ema[order(tasa_acumulada)]
+    )
+  )
+
+if (nrow(datos_plot_chik) != 12) {
+  warning(
+    "El gráfico de chikungunya debería tener 12 regiones EMA, pero tiene ",
+    nrow(datos_plot_chik), ".",
+    call. = FALSE
+  )
+}
+
+p_ranking_chik <- ggplot(
+  datos_plot_chik,
+  aes(x = region_ema, y = tasa_acumulada, fill = tasa_acumulada)
+) +
+  geom_col(width = 0.72, color = NA, show.legend = FALSE) +
+  geom_text(
+    aes(
+      label = formatC(
+        tasa_acumulada,
+        format = "f",
+        digits = 2,
+        big.mark = ".",
+        decimal.mark = ","
+      )
+    ),
+    hjust = -0.12,
+    size = 3.2,
+    color = "grey20"
+  ) +
+  coord_flip() +
+  scale_x_discrete(
+    labels = function(x) str_wrap(x, 22)
+  ) +
+  scale_fill_gradient(low = "#FDD0C5", high = "#7F0000", guide = "none") +
+  scale_y_continuous(
+    labels = scales::label_number(
+      big.mark = ".",
+      decimal.mark = ",",
+      accuracy = 1
+    ),
+    expand = expansion(mult = c(0, 0.22))
+  ) +
+  labs(
+    title = "Tasa de incidencia acumulada de chikungunya por regiones EMA",
+    subtitle = "Casos por 100.000 habitantes, 2020-2025",
+    x = NULL,
+    y = "Tasa por 100.000 habitantes",
+    caption = paste(
+      "Fuente: SIVIGILA/INS (series municipales) y proyecciones municipales DANE 2018-2042.",
+      "\nCartagena se separa del resto de Bolívar. La tasa acumulada usa la población anual promedio."
+    )
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.text.y = element_text(face = "bold", color = "grey20"),
+    axis.title.x = element_text(margin = margin(t = 8)),
+    plot.title = element_text(face = "bold", size = 14),
+    plot.subtitle = element_text(color = "grey35"),
+    plot.caption = element_text(hjust = 0, color = "grey45", size = 8),
+    plot.margin = margin(10, 20, 10, 10)
+  )
+
+ruta_grafica_chik <- here("graficas", "G_10", "10_ranking_regiones_chik.png")
+
+if (requireNamespace("ragg", quietly = TRUE)) {
+  ggsave(
+    filename = ruta_grafica_chik,
+    plot = p_ranking_chik,
+    width = 10,
+    height = 6.5,
+    dpi = 300,
+    bg = "white",
+    device = ragg::agg_png
+  )
+} else {
+  ggsave(
+    filename = ruta_grafica_chik,
+    plot = p_ranking_chik,
+    width = 10,
+    height = 6.5,
+    dpi = 300,
+    bg = "white"
+  )
+}
+
+message("Gráfico chikungunya guardado en: ", ruta_grafica_chik)
 message("✅ Script 10 finalizado.")
