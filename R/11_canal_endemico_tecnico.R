@@ -865,3 +865,4 @@ for (nombre in names(datos_enfermedades)) {
 }
 
 message("✅ Script 11 finalizado.")
+

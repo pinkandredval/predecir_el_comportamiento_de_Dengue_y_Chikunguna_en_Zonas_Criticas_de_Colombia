@@ -355,7 +355,7 @@ grafico_serie <- function(serie, nombre, color) {
 p_d <- grafico_serie(serie_dengue, "Dengue",      "#08519C")
 p_c <- grafico_serie(serie_chik,   "Chikungunya", "#B2182B")
 
-print(p_d); print(p_c)
+if (interactive()) { print(p_d); print(p_c) }  # vista previa; los PNG se guardan abajo
 
 ggsave(here("graficas", "G_07", "serie_nacional_dengue.png"),
        p_d, width = 10, height = 4, dpi = 150, bg = "white")

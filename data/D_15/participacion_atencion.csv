@@ -1,0 +1,2 @@
+modelo,enfermedad,b_hat,theta_hat,delta_I,delta_M,contribucion_enfermedad,contribucion_miedo,pi_atencion,pi_atencion_pct,pico,base,n_obs,r2
+Dengue (principal),dengue,0.006088243934906937,0.07179410137237575,46.346835259517896,12.77169100260787,0.28217083867089077,0.9169320785378887,0.7646817177897324,76.46817177897324,2024-Q2 (abril-junio),2022-Q2 y 2023-Q2 (abril-junio),576,0.9457531878483385

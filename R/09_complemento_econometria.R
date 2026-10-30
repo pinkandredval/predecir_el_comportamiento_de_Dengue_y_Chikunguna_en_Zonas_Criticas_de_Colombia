@@ -224,7 +224,7 @@ fit_garch_mensual <- ugarchfit(
   solver = "hybrid"
 )
 
-stopifnot(convergence(fit_garch_mensual) == 0)
+stopifnot(rugarch::convergence(fit_garch_mensual) == 0)
 
 cat("\n--- GARCH(1,1) mensual (misma escala Box-Cox que el SARIMA) ---\n")
 print(fit_garch_mensual)
@@ -305,7 +305,7 @@ fit_garch_semanal <- tryCatch(
   error = function(e) NULL
 )
 
-if (is.null(fit_garch_semanal) || convergence(fit_garch_semanal) != 0) {
+if (is.null(fit_garch_semanal) || rugarch::convergence(fit_garch_semanal) != 0) {
   cat("\nGJR-GARCH semanal no converge; se intenta EGARCH semanal.\n")
   spec_garch_semanal <- ugarchspec(
     variance.model     = list(model = "eGARCH", garchOrder = c(1, 1)),
@@ -321,7 +321,7 @@ if (is.null(fit_garch_semanal) || convergence(fit_garch_semanal) != 0) {
 }
 
 stopifnot(!is.null(fit_garch_semanal),
-          convergence(fit_garch_semanal) == 0)
+          rugarch::convergence(fit_garch_semanal) == 0)
 
 cat("\n--- GARCH semanal (log1p, 313 semanas) ---\n")
 print(fit_garch_semanal)

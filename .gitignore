@@ -2,7 +2,23 @@
 .Rproj.user
 .Rhistory
 .RData
+.RDataTmp
 .Ruserdata
+*.RData
+*.rda
+
+# Credenciales y variables de entorno locales
+.Renviron
+.Renviron.*
+
+# Salida por defecto de R cuando un plot() no tiene dispositivo (ver script 04)
+Rplots.pdf
+
+# Basura del sistema operativo y de Office
+.DS_Store
+Thumbs.db
+desktop.ini
+~$*
 
 # renv
 renv/library/
@@ -11,28 +27,15 @@ renv/python/
 renv/local/
 renv/cellar/
 
-# Datos crudos
-data/raw/**/*.csv
-data/raw/**/*.xlsx
-data/raw/**/*.zip
+# Datos crudos (SIVIGILA, DANE, EMA): no se versionan, solo la estructura
+data/raw/**
+!data/raw/**/
+!data/raw/**/.gitkeep
 
 # Datos generados por los scripts (pesados, se regeneran)
 # La carpeta D_XX corresponde al script XX que produce sus archivos.
 # Red de seguridad: ningún .rds se versiona.
 *.rds
-
-# D_01: dengue_crudo.rds, chikungunya_crudo.rds
-data/D_01/*.rds
-# D_02: dengue_prep.rds, chikungunya_prep.rds
-data/D_02/*.rds
-data/D_05/*.rds
-# D_06: datos imputados y objetos mids de mice
-data/D_06/*.rds
-data/D_07/*.rds
-data/D_08/*.rds
-data/D_09/*.rds
-data/D_10/*.rds
-data/D_13/*.rds
 
 # Microdatos imputados (mids de mice, para pooling posterior)
 data/D_06/*_mice_mids.rds
@@ -41,10 +44,14 @@ data/D_06/comparacion_na_*.csv
 # Diagnóstico pre-imputación (se regenera con el script 05)
 data/D_05/diagnostico_imputacion.csv
 
+# Series de tasas municipio-semana del script 10 (20,5 MB, se regeneran)
+# OJO: son entrada de los scripts 11, 12 y 13.
+# En un clon nuevo hay que ejecutar el script 10 antes de esos tres.
+data/D_10/serie_dengue_tasas.csv
+data/D_10/serie_chik_tasas.csv
+
 # Outputs
 output/
 
 # Logs
 *.log
-
-.RDataTmp

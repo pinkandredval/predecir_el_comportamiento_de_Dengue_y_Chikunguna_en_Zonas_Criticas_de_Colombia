@@ -536,7 +536,9 @@ pruebas <- bind_rows(pruebas_nacional, pruebas_regionales) |>
     across(c(adf_estadistico, kpss_estadistico), ~ round(.x, 4)),
     across(c(adf_p, kpss_p), ~ round(.x, 6))
   ) |>
-  select(
+  # dplyr::select explícito: MASS (y otros paquetes) exportan un select()
+  # que, si queda adjunto después de dplyr, rompe este paso.
+  dplyr::select(
     nivel, region_ema, variable, variable_etiqueta, periodo,
     n_obs, minimo, maximo, n_ceros, n_negativos,
     boxcox_aplica, boxcox_lambda, boxcox_nota,
@@ -907,7 +909,7 @@ for (r in regiones_ema) {
 
 cat("\n--- Diagnóstico por serie ---\n")
 resumen_diag <- pruebas |>
-  count(diagnostico, name = "n") |>
+  dplyr::count(diagnostico, name = "n") |>
   arrange(desc(n))
 
 for (i in seq_len(nrow(resumen_diag))) {
@@ -986,7 +988,7 @@ motivos <- pruebas |>
       TRUE ~ boxcox_nota
     )
   ) |>
-  count(motivo, name = "n") |>
+  dplyr::count(motivo, name = "n") |>
   arrange(desc(n))
 
 cat("\n  Series sin Box-Cox (motivo):\n")
@@ -1017,3 +1019,4 @@ if (nrow(no_eval) > 0) {
 }
 
 message("\n✅ Script 14 finalizado.")
+

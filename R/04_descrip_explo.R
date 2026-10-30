@@ -124,6 +124,9 @@ print(chikungunya %>% tabyl(sexo, pac_hos))
 # 6. GRÁFICOS
 # ============================================================
 
+# Todas las figuras se guardan en graficas/G_04/ (no en Rplots.pdf).
+dir.create(here("graficas", "G_04"), recursive = TRUE, showWarnings = FALSE)
+
 # --- Paletas por evento (distintos tonos en cada gráfico) ---
 # Dengue: tonos azules
 # Chikungunya: tonos rojo-naranja
@@ -142,7 +145,7 @@ edad_barras <- datos_comp %>%
   mutate(pct = round(n / sum(n) * 100, 1)) %>%
   ungroup()
 
-ggplot(edad_barras, aes(x = grupo_edad, y = pct, fill = evento)) +
+p_edad <- ggplot(edad_barras, aes(x = grupo_edad, y = pct, fill = evento)) +
   geom_col(alpha = 0.9) +
   geom_text(aes(label = ifelse(pct >= 2, paste0(pct, "%"), "")),
             vjust = -0.3, size = 2.8) +
@@ -161,8 +164,11 @@ ggplot(edad_barras, aes(x = grupo_edad, y = pct, fill = evento)) +
     axis.text.x = element_text(angle = 45, hjust = 1, size = 7)
   )
 
+ggsave(here("graficas", "G_04", "04_edad_grupos.png"),
+       plot = p_edad, width = 10, height = 7, dpi = 150, bg = "white")
+
 # --- 6.2 Boxplot edad × sexo por evento ---
-ggplot(datos_comp, aes(x = sexo, y = edad, fill = sexo)) +
+p_edad_sexo <- ggplot(datos_comp, aes(x = sexo, y = edad, fill = sexo)) +
   geom_boxplot(alpha = 0.85, outlier.size = 0.5, outlier.alpha = 0.4) +
   facet_wrap(~ evento, scales = "free_y") +
   scale_fill_manual(values = c("F" = "#74A9CF", "M" = "#0570B0")) +
@@ -174,8 +180,11 @@ ggplot(datos_comp, aes(x = sexo, y = edad, fill = sexo)) +
   theme_minimal(base_size = 12) +
   theme(legend.position = "none")
 
+ggsave(here("graficas", "G_04", "04_edad_sexo.png"),
+       plot = p_edad_sexo, width = 9, height = 6, dpi = 150, bg = "white")
+
 # --- 6.3 Tipo de caso (barras con % y colores distintos por evento) ---
-datos_comp %>%
+p_tipo_caso <- datos_comp %>%
   count(evento, tip_cas) %>%
   group_by(evento) %>%
   mutate(pct = round(n / sum(n) * 100, 1)) %>%
@@ -196,8 +205,11 @@ datos_comp %>%
   theme_minimal(base_size = 12) +
   theme(legend.position = "none")
 
+ggsave(here("graficas", "G_04", "04_tipo_caso.png"),
+       plot = p_tipo_caso, width = 9, height = 6, dpi = 150, bg = "white")
+
 # --- 6.4 Sexo (barras con % y colores propios) ---
-datos_comp %>%
+p_sexo <- datos_comp %>%
   count(evento, sexo) %>%
   group_by(evento) %>%
   mutate(pct = round(n / sum(n) * 100, 1)) %>%
@@ -217,8 +229,11 @@ datos_comp %>%
   theme_minimal(base_size = 12) +
   theme(legend.position = "none")
 
+ggsave(here("graficas", "G_04", "04_sexo.png"),
+       plot = p_sexo, width = 8, height = 5, dpi = 150, bg = "white")
+
 # --- 6.5 Hospitalización (barras con % y colores propios) ---
-datos_comp %>%
+p_hospitalizacion <- datos_comp %>%
   count(evento, pac_hos) %>%
   group_by(evento) %>%
   mutate(pct = round(n / sum(n) * 100, 1)) %>%
@@ -238,12 +253,15 @@ datos_comp %>%
   theme_minimal(base_size = 12) +
   theme(legend.position = "none")
 
+ggsave(here("graficas", "G_04", "04_hospitalizacion.png"),
+       plot = p_hospitalizacion, width = 8, height = 5, dpi = 150, bg = "white")
+
 # --- 6.6 Serie temporal por semana - Dengue (Escala Logarítmica) ---
 serie_dengue <- datos_comp %>%
   filter(evento == "Dengue") %>%
   count(anio, semana)
 
-ggplot(serie_dengue, aes(x = semana, y = n, color = factor(anio))) +
+p_serie_semanal_dengue <- ggplot(serie_dengue, aes(x = semana, y = n, color = factor(anio))) +
   geom_line(linewidth = 0.8) +
   scale_color_manual(
     values = c("2020" = "#08519C",
@@ -265,12 +283,16 @@ ggplot(serie_dengue, aes(x = semana, y = n, color = factor(anio))) +
   theme_minimal(base_size = 12) +
   theme(legend.position = "right")
 
+ggsave(here("graficas", "G_04", "04_serie_semanal_dengue.png"),
+       plot = p_serie_semanal_dengue, width = 10, height = 5,
+       dpi = 150, bg = "white")
+
 # --- 6.6 Serie temporal por semana - Chikungunya (Escala Logarítmica) ---
 serie_chik <- datos_comp %>%
   filter(evento == "Chikungunya") %>%
   count(anio, semana)
 
-ggplot(serie_chik, aes(x = semana, y = n, color = factor(anio))) +
+p_serie_semanal_chik <- ggplot(serie_chik, aes(x = semana, y = n, color = factor(anio))) +
   geom_line(linewidth = 0.8) +
   scale_color_manual(
     values = c("2020" = "#A50F15",
@@ -292,11 +314,15 @@ ggplot(serie_chik, aes(x = semana, y = n, color = factor(anio))) +
   theme_minimal(base_size = 12) +
   theme(legend.position = "right")
 
+ggsave(here("graficas", "G_04", "04_serie_semanal_chikungunya.png"),
+       plot = p_serie_semanal_chik, width = 10, height = 5,
+       dpi = 150, bg = "white")
+
 # --- 6.7 Serie temporal continua por evento (años en ambos paneles) ---
 colores_evento <- c("Dengue" = "#08519C", "Chikungunya" = "#A50F15")
 rango_fechas <- range(datos_comp$fecha_epi, na.rm = TRUE)
 
-datos_comp %>%
+p_serie_continua <- datos_comp %>%
   count(fecha_epi, evento) %>%
   ggplot(aes(x = fecha_epi, y = n, color = evento)) +
   geom_line(linewidth = 0.6) +
@@ -318,6 +344,9 @@ datos_comp %>%
     legend.position = "none",
     axis.text.x     = element_text(angle = 45, hjust = 1)
   )
+
+ggsave(here("graficas", "G_04", "04_serie_continua.png"),
+       plot = p_serie_continua, width = 10, height = 7, dpi = 150, bg = "white")
 
 # ============================================================
 # 7. ATÍPICOS EN EDAD

@@ -68,6 +68,17 @@ clasificar_celdas <- function(df) {
   estados
 }
 
+# clasificar_celdas() tarda ~15 s y ocupa ~400 MB con dengue (748.037 filas).
+# Por eso se calcula UNA sola vez por evento y se reutiliza.
+.cache_estados <- new.env(parent = emptyenv())
+
+estados_de <- function(df, id) {
+  if (is.null(.cache_estados[[id]])) {
+    .cache_estados[[id]] <- clasificar_celdas(df)
+  }
+  .cache_estados[[id]]
+}
+
 categorias_vars <- list(
   "Identificación"        = c("consecutive", "cod_eve", "nombre_evento", "evento"),
   "Temporales"            = c("fec_not", "semana", "ano", "anio", "fecha_epi", "ini_sin", "fec_con"),
@@ -123,8 +134,8 @@ falt_chik   <- resumen_faltantes(chikungunya, "Chikungunya")
 # 3. FUNCIONES DE VISUALIZACIÓN (Patrones y Mapas corregidos)
 # ============================================================
 
-patron_faltantes <- function(df, nombre_evento, categoria_filtro) {
-  estados <- clasificar_celdas(df)
+patron_faltantes <- function(df, nombre_evento, categoria_filtro, estados = NULL) {
+  if (is.null(estados)) estados <- clasificar_celdas(df)
   vars_cat <- intersect(categorias_vars[[categoria_filtro]], names(estados))
   
   if (length(vars_cat) < 2) return(invisible(NULL))
@@ -178,7 +189,6 @@ patron_faltantes <- function(df, nombre_evento, categoria_filtro) {
       name = NULL
     ) +
     scale_x_discrete(position = "top") +
-    scale_y_discrete(limits = rev(levels(df_long$fila))) +
     labs(title = paste0("Patrón de faltantes (3 estados) — ", nombre_evento),
          subtitle = paste0("Categoría: ", categoria_filtro, " | Total filas: ", format(n_total_filas, big.mark = ",")),
          x = NULL, y = NULL) +
@@ -186,16 +196,23 @@ patron_faltantes <- function(df, nombre_evento, categoria_filtro) {
     theme_minimal(base_size = 10) +
     theme(
       panel.grid = element_blank(),
-      axis.text.x = element_text(size = 9, face = "bold", angle = 45, hjust = 0),
+      # Etiquetas ancladas por su extremo derecho para que crezcan hacia el
+      # panel y no hacia el título (con hjust = 0 invadían el título).
+      axis.text.x = element_text(size = 9, face = "bold", angle = 45, hjust = 1, vjust = 1),
       axis.text.y = element_blank(),
       axis.ticks = element_blank(),
-      legend.position = "top",
-      plot.margin = margin(10, 50, 20, 50)
+      # Título/subtítulo anclados al borde del gráfico: así quedan por encima
+      # de las etiquetas rotadas en vez de chocar con ellas.
+      plot.title.position = "plot",
+      legend.position  = "bottom",
+      legend.direction = "horizontal",
+      legend.margin    = margin(t = 14, r = 0, b = 0, l = 0),
+      plot.margin      = margin(12, 50, 25, 50)
     )
 }
 
-mapa_faltantes_completo <- function(df, nombre_evento, categoria_filtro) {
-  estados <- clasificar_celdas(df)
+mapa_faltantes_completo <- function(df, nombre_evento, categoria_filtro, estados = NULL) {
+  if (is.null(estados)) estados <- clasificar_celdas(df)
   vars_cat <- intersect(categorias_vars[[categoria_filtro]], names(estados))
   
   if (length(vars_cat) == 0) return(invisible(NULL))
@@ -271,41 +288,66 @@ mapa_faltantes_completo <- function(df, nombre_evento, categoria_filtro) {
 # ============================================================
 
 dir.create(here("graficas", "G_05"), recursive = TRUE, showWarnings = FALSE)
+dir.create(here("data", "D_05"), recursive = TRUE, showWarnings = FALSE)
 
 for (evento in c("dengue", "chikungunya")) {
-  df_evt <- get(evento)
+  df_evt  <- get(evento)
   nom_evt <- tools::toTitleCase(evento)
+  est_evt <- estados_de(df_evt, evento)   # se calcula una sola vez por evento
   
-  cat("\nProcesando evento:", nom_evt, "\n")
+  cat("\nProcesando evento:", nom_evt,
+      "|", format(nrow(df_evt), big.mark = ","), "filas x", ncol(df_evt), "columnas\n")
   
   for (cat_actual in names(categorias_vars)) {
-    vars_cat <- intersect(categorias_vars[[cat_actual]], names(clasificar_celdas(df_evt)))
+    vars_cat   <- intersect(categorias_vars[[cat_actual]], names(est_evt))
     n_vars_cat <- length(vars_cat)
     
-    if (n_vars_cat < 2) next
+    if (n_vars_cat < 2) {
+      cat("  -", cat_actual, ": solo", n_vars_cat, "variable(s) disponibles -> se omite\n")
+      next
+    }
     
-    p1 <- patron_faltantes(df_evt, nom_evt, cat_actual)
+    cat("  -", cat_actual, "(", n_vars_cat, "vars)")
+    
+    # --- Patrón de faltantes (3 estados) ---
+    p1 <- patron_faltantes(df_evt, nom_evt, cat_actual, estados = est_evt)
     if (!is.null(p1)) {
-      print(p1)
+      altura_1 <- max(4, 0.25 * nrow(unique(est_evt[, vars_cat, drop = FALSE])) + 3)
+      ancho_1  <- max(7, 0.8 * n_vars_cat + 3)
+      
       ggsave(
         here("graficas", "G_05", paste0("patron_md_", evento, "_", cat_actual, ".png")),
         plot = p1,
-        width = max(7, 0.8 * n_vars_cat + 3),
-        height = max(4, 0.25 * nrow(unique(clasificar_celdas(df_evt)[, vars_cat, drop = FALSE])) + 3),
+        width  = ancho_1,
+        height = altura_1,
         dpi = 150, bg = "white"
       )
+      
+      # Compatibilidad con el nombre antiguo (sin el sufijo "_md_"):
+      # misma figura, mismo tamaño, solo cambia el nombre del archivo.
+      ggsave(
+        here("graficas", "G_05", paste0("patron_", evento, "_", cat_actual, ".png")),
+        plot = p1,
+        width  = ancho_1,
+        height = altura_1,
+        dpi = 150, bg = "white"
+      )
+      cat(" -> patron OK")
     }
     
-    p2 <- mapa_faltantes_completo(df_evt, nom_evt, cat_actual)
+    # --- Mapa de composición presente/faltante/no aplica ---
+    p2 <- mapa_faltantes_completo(df_evt, nom_evt, cat_actual, estados = est_evt)
     if (!is.null(p2)) {
-      print(p2)
       ggsave(
         here("graficas", "G_05", paste0("mapa_", evento, "_", cat_actual, ".png")),
         plot = p2,
-        width = 9,
+        width  = 9,
         height = max(4, 0.3 * n_vars_cat + 2),
         dpi = 150, bg = "white"
       )
+      cat(" | mapa OK\n")
+    } else {
+      cat("\n")
     }
   }
 }
@@ -316,8 +358,8 @@ cat("\n✅ ¡Proceso finalizado correctamente! Gráficas sincronizadas y guardad
 # 5. RESUMEN DE FALTANTES POR CATEGORÍA (tablas)
 # ============================================================
 
-patron_por_categoria <- function(df, nombre) {
-  estados <- clasificar_celdas(df)
+patron_por_categoria <- function(df, nombre, estados = NULL) {
+  if (is.null(estados)) estados <- clasificar_celdas(df)
   resultados <- list()
   
   for (cat_nombre in names(categorias_vars)) {
@@ -345,15 +387,16 @@ patron_por_categoria <- function(df, nombre) {
   bind_rows(resultados)
 }
 
-patron_dengue <- patron_por_categoria(dengue, "Dengue")
-patron_chik   <- patron_por_categoria(chikungunya, "Chikungunya")
+patron_dengue <- patron_por_categoria(dengue, "Dengue", estados_de(dengue, "dengue"))
+patron_chik   <- patron_por_categoria(chikungunya, "Chikungunya", estados_de(chikungunya, "chikungunya"))
 
 # ============================================================
 # 6. TOP 15 PATRONES DE FALTANTES REALES (registros)
 # ============================================================
 
-patrones_reales <- function(df, nombre) {
-  estados <- clasificar_celdas(df) %>%
+patrones_reales <- function(df, nombre, estados = NULL) {
+  if (is.null(estados)) estados <- clasificar_celdas(df)
+  estados <- estados %>%
     dplyr::select(-any_of(c("consecutive", "cod_eve", "nombre_evento",
                      "evento", "va_sispro", "ano")))
   
@@ -382,10 +425,10 @@ patrones_reales <- function(df, nombre) {
 }
 
 cat("\n--- TOP 15 PATRONES DE FALTANTES REALES (Dengue) ---\n")
-print(as.data.frame(patrones_reales(dengue, "Dengue")), row.names = FALSE)
+print(as.data.frame(patrones_reales(dengue, "Dengue", estados_de(dengue, "dengue"))), row.names = FALSE)
 
 cat("\n--- TOP 15 PATRONES DE FALTANTES REALES (Chikungunya) ---\n")
-print(as.data.frame(patrones_reales(chikungunya, "Chikungunya")), row.names = FALSE)
+print(as.data.frame(patrones_reales(chikungunya, "Chikungunya", estados_de(chikungunya, "chikungunya"))), row.names = FALSE)
 
 # ============================================================
 # 7. DIAGNÓSTICO FINAL
@@ -423,9 +466,9 @@ cat("=========================================================\n")
 # ------------------------------------------------------------
 # 8.1 Diagnóstico básico
 # ------------------------------------------------------------
-diagnostico_basico <- function(df, nombre) {
+diagnostico_basico <- function(df, nombre, estados = NULL) {
   
-  estados <- clasificar_celdas(df)
+  if (is.null(estados)) estados <- clasificar_celdas(df)
   
   resumen_var <- tibble(
     variable      = names(estados),
@@ -480,8 +523,8 @@ test_mcar_seguro <- function(df, nombre, n_max = 5000) {
 # ------------------------------------------------------------
 # 8.3 Coocurrencia de faltantes
 # ------------------------------------------------------------
-coocurrencia_na <- function(df) {
-  estados <- clasificar_celdas(df)
+coocurrencia_na <- function(df, estados = NULL) {
+  if (is.null(estados)) estados <- clasificar_celdas(df)
   vars    <- names(estados)[sapply(estados, function(x) any(x == "faltante"))]
   if (length(vars) < 2) return(NULL)
   
@@ -492,9 +535,9 @@ coocurrencia_na <- function(df) {
 # ------------------------------------------------------------
 # 8.4 Función maestra: diagnóstico + recomendación
 # ------------------------------------------------------------
-diagnostico_imputacion <- function(df, nombre, mcar_result, cor_na) {
+diagnostico_imputacion <- function(df, nombre, mcar_result, cor_na, estados = NULL) {
   
-  diag <- diagnostico_basico(df, nombre)
+  diag <- diagnostico_basico(df, nombre, estados = estados)
   
   # --- Decisión MCAR ---
   if (is.null(mcar_result)) {
@@ -631,11 +674,14 @@ diagnostico_imputacion <- function(df, nombre, mcar_result, cor_na) {
 mcar_d <- test_mcar_seguro(dengue,      "Dengue",      n_max = 5000)
 mcar_c <- test_mcar_seguro(chikungunya, "Chikungunya", n_max = 5000)
 
-cor_d  <- coocurrencia_na(dengue)
-cor_c  <- coocurrencia_na(chikungunya)
+est_d <- estados_de(dengue, "dengue")
+est_c <- estados_de(chikungunya, "chikungunya")
 
-tabla_d <- diagnostico_imputacion(dengue,      "Dengue",      mcar_d, cor_d)
-tabla_c <- diagnostico_imputacion(chikungunya, "Chikungunya", mcar_c, cor_c)
+cor_d  <- coocurrencia_na(dengue, est_d)
+cor_c  <- coocurrencia_na(chikungunya, est_c)
+
+tabla_d <- diagnostico_imputacion(dengue,      "Dengue",      mcar_d, cor_d, estados = est_d)
+tabla_c <- diagnostico_imputacion(chikungunya, "Chikungunya", mcar_c, cor_c, estados = est_c)
 
 tabla_resumen <- bind_rows(tabla_d, tabla_c)
 
@@ -654,3 +700,234 @@ write.csv(tabla_resumen,
           row.names = FALSE)
 
 cat("\n✅ Diagnóstico pre-imputación completado.\n")
+
+# ============================================================
+# 9. GRÁFICAS GLOBALES (las que faltaban en la carpeta G_05)
+#    vis_miss · % faltante por variable · coocurrencia · resumen MCAR
+# ============================================================
+
+cat("\n")
+cat("=========================================================\n")
+cat("9. GRÁFICAS GLOBALES\n")
+cat("=========================================================\n")
+
+# ------------------------------------------------------------
+# 9.1 vis_miss: patrón global de faltantes REALES
+#     (se muestrea para que sea legible y rápido: 748k filas no se pueden
+#      dibujar celda a celda)
+# ------------------------------------------------------------
+graficar_vis_miss <- function(estados, nom_evt, evento, n_filas = 3000) {
+  
+  df <- estados
+  
+  # Solo columnas que tienen al menos un faltante real: si se grafican las 71,
+  # el 90% de la imagen queda vacía y las etiquetas se vuelven ilegibles.
+  con_faltante <- names(df)[sapply(df, function(x) any(x == "faltante"))]
+  if (length(con_faltante) == 0) return(invisible(NULL))
+  df <- df[, con_faltante, drop = FALSE]
+  
+  if (nrow(df) > n_filas) {
+    set.seed(123)
+    df <- df[sample(nrow(df), n_filas), , drop = FALSE]
+  }
+  
+  # "faltante" -> NA (lo que se quiere ver); "no_aplica" -> "estructural"
+  # para no confundir el NA estructural con el faltante real
+  df <- df %>%
+    mutate(across(everything(), ~ case_when(
+      . == "faltante"  ~ NA_character_,
+      . == "no_aplica" ~ "estructural",
+      TRUE             ~ "presente"
+    )))
+  
+  # vis_miss necesita al menos una columna con NA
+  if (!any(sapply(df, function(x) any(is.na(x))))) return(invisible(NULL))
+  
+  p <- tryCatch(
+    naniar::vis_miss(df, cluster = TRUE),
+    error = function(e) naniar::vis_miss(df, cluster = FALSE)
+  )
+  p <- p +
+    labs(title = paste0("Patrón global de faltantes reales — ", nom_evt),
+         subtitle = paste0(length(con_faltante),
+                           " variables con faltante real | muestra aleatoria de ",
+                           format(min(n_filas, nrow(estados)), big.mark = ","),
+                           " de ", format(nrow(estados), big.mark = ","),
+                           " filas | gris oscuro = faltante real")) +
+    theme(
+      plot.title.position = "plot",
+      plot.margin     = margin(15, 15, 10, 10),
+      axis.text.x     = element_text(angle = 45, hjust = 1, vjust = 1, size = 7),
+      plot.subtitle   = element_text(margin = margin(b = 25))
+    )
+  
+  arch <- here("graficas", "G_05", paste0("vis_miss_", evento, ".png"))
+  ggsave(arch, plot = p, width = 13, height = 7, dpi = 150, bg = "white")
+  invisible(arch)
+}
+
+# ------------------------------------------------------------
+# 9.2 % de faltante real por variable
+# ------------------------------------------------------------
+graficar_pct_faltante <- function(falt_resumen, nom_evt, evento) {
+  
+  datos <- falt_resumen %>%
+    filter(pct_real > 0) %>%
+    mutate(variable = fct_reorder(variable, pct_real))
+  
+  if (nrow(datos) == 0) return(invisible(NULL))
+  
+  # Variables con faltante real pero < 0.01% (pct_real redondeado a 0):
+  # no se dibujan para no ensuciar el eje, pero se reportan en el subtítulo.
+  n_minusculas <- sum(falt_resumen$n_na_real > 0) - nrow(datos)
+  
+  paleta <- c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "#66A61E",
+              "#E6AB02", "#A6761D", "#666666", "#1F78B4", "#B15928")
+  cats   <- sort(unique(datos$categoria))
+  paleta <- setNames(rep(paleta, length.out = length(cats)), cats)
+  
+  p <- ggplot(datos, aes(x = variable, y = pct_real, fill = categoria)) +
+    geom_col(width = 0.75) +
+    geom_text(aes(label = paste0(pct_real, "%")), hjust = -0.15, size = 2.6) +
+    scale_fill_manual(values = paleta, name = "Categoría") +
+    scale_y_continuous(expand = expansion(mult = c(0, 0.15))) +
+    coord_flip(clip = "off") +
+    labs(title = paste0("Porcentaje de faltante real por variable — ", nom_evt),
+         subtitle = paste0(nrow(datos), " variables con >=0.01% de faltante real",
+                           if (n_minusculas > 0)
+                             paste0(" | ", n_minusculas, " variable(s) más con <0.01% (no graficadas)"),
+                           " | excluye NA estructural"),
+         x = NULL, y = "% faltante real") +
+    theme_minimal(base_size = 10) +
+    theme(panel.grid.major.y = element_blank(),
+          legend.position = "right",
+          plot.margin = margin(5, 30, 5, 5))
+  
+  arch <- here("graficas", "G_05", paste0("pct_faltante_por_variable_", evento, ".png"))
+  ggsave(arch, plot = p,
+         width = 10, height = max(5, 0.22 * nrow(datos) + 2.5),
+         dpi = 150, bg = "white", limitsize = FALSE)
+  invisible(arch)
+}
+
+# ------------------------------------------------------------
+# 9.3 Coocurrencia de faltantes (matriz de correlación ordenada)
+# ------------------------------------------------------------
+graficar_coocurrencia <- function(cor_na, nom_evt, evento) {
+  
+  if (is.null(cor_na)) return(invisible(NULL))
+  
+  cor_na[is.na(cor_na)] <- 0
+  
+  # Ordenar por similitud para que los bloques se vean
+  ord <- tryCatch({
+    hc <- hclust(as.dist(1 - abs(cor_na)))
+    hc$order
+  }, error = function(e) seq_len(ncol(cor_na)))
+  
+  vars <- colnames(cor_na)[ord]
+  
+  df_long <- as.data.frame(cor_na[vars, vars]) %>%
+    tibble::rownames_to_column("var1") %>%
+    pivot_longer(-var1, names_to = "var2", values_to = "r") %>%
+    mutate(var1 = factor(var1, levels = vars),
+           var2 = factor(var2, levels = vars))
+  
+  p <- ggplot(df_long, aes(x = var2, y = var1, fill = r)) +
+    geom_tile() +
+    scale_fill_gradient2(low = "#2166AC", mid = "#FFFFFF", high = "#B2182B",
+                         midpoint = 0, limits = c(-1, 1), name = "r") +
+    labs(title = paste0("Coocurrencia de faltantes — ", nom_evt),
+         subtitle = paste0(length(vars),
+                           " variables con faltante | r = 1 indica que faltan siempre juntas"),
+         x = NULL, y = NULL) +
+    theme_minimal(base_size = 9) +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = 6),
+          axis.text.y = element_text(size = 6),
+          panel.grid = element_blank())
+  
+  arch <- here("graficas", "G_05", paste0("coocurrencia_na_", evento, ".png"))
+  lado <- max(7, 0.18 * length(vars) + 3)
+  ggsave(arch, plot = p, width = lado, height = lado,
+         dpi = 150, bg = "white", limitsize = FALSE)
+  invisible(arch)
+}
+
+# ------------------------------------------------------------
+# 9.4 Resumen MCAR / decisión de imputación (tabla-figura)
+# ------------------------------------------------------------
+graficar_resumen_mcar <- function(tabla) {
+  
+  t <- tabla %>%
+    transmute(
+      evento,
+      `Filas`              = format(n_filas, big.mark = ","),
+      `Variables`          = as.character(n_vars),
+      `% faltante máx.`    = paste0(max_pct_faltante, "%"),
+      `Mediana % faltante` = paste0(mediana_pct_faltante, "%"),
+      `Vars >40% NA`       = as.character(n_vars_criticas_40),
+      `Filas con >50% NA`  = paste0(pct_filas_malas, "%"),
+      `p Little`           = ifelse(is.na(mcar_p_value), "n/d",
+                                    format(mcar_p_value, scientific = TRUE)),
+      `Mecanismo`          = mecanismo,
+      `Pares NA |r|>0.3`   = as.character(n_pares_corr_na)
+    )
+  
+  long <- t %>%
+    pivot_longer(-evento, names_to = "metrica", values_to = "valor") %>%
+    mutate(metrica = factor(metrica, levels = names(t)[-1]))
+  
+  p <- ggplot(long, aes(x = metrica, y = evento)) +
+    geom_tile(fill = "#F4F4F4", color = "white", linewidth = 1.2) +
+    geom_text(aes(label = valor), size = 3.1) +
+    labs(title = "Resumen del diagnóstico de faltantes y prueba MCAR",
+         subtitle = "Fuente: Little's MCAR test (naniar::mcar_test) sobre muestra de 5.000 filas",
+         x = NULL, y = NULL) +
+    theme_minimal(base_size = 10) +
+    theme(panel.grid = element_blank(),
+          axis.text.x = element_text(angle = 35, hjust = 1, size = 8),
+          axis.text.y = element_text(face = "bold"))
+  
+  arch <- here("graficas", "G_05", "resumen_mcar.png")
+  ggsave(arch, plot = p, width = 12, height = 3.2, dpi = 150, bg = "white")
+  invisible(arch)
+}
+
+# ------------------------------------------------------------
+# 9.5 Ejecutar y reportar
+# ------------------------------------------------------------
+eventos_graf <- list(
+  dengue      = list(df = dengue,      est = est_d, falt = falt_dengue, cor = cor_d),
+  chikungunya = list(df = chikungunya, est = est_c, falt = falt_chik,   cor = cor_c)
+)
+
+for (evento in names(eventos_graf)) {
+  info    <- eventos_graf[[evento]]
+  nom_evt <- tools::toTitleCase(evento)
+  
+  cat("\n Evento:", nom_evt, "\n")
+  
+  a <- graficar_vis_miss(info$est, nom_evt, evento)
+  cat("   vis_miss ..............", if (is.null(a)) "omitido" else "OK", "\n")
+  
+  b <- graficar_pct_faltante(info$falt, nom_evt, evento)
+  cat("   pct_faltante ..........", if (is.null(b)) "omitido (sin faltantes reales)" else "OK", "\n")
+  
+  d <- graficar_coocurrencia(info$cor, nom_evt, evento)
+  cat("   coocurrencia ..........", if (is.null(d)) "omitido (<2 vars con NA)" else "OK", "\n")
+}
+
+e <- graficar_resumen_mcar(tabla_resumen)
+cat("\n resumen_mcar ...........", if (is.null(e)) "omitido" else "OK", "\n")
+
+# ------------------------------------------------------------
+# 9.6 Inventario de lo generado
+# ------------------------------------------------------------
+archivos <- list.files(here("graficas", "G_05"), pattern = "\\.png$", full.names = FALSE)
+
+cat("\n=========================================================\n")
+cat("ARCHIVOS EN graficas/G_05 (", length(archivos), " PNG )\n", sep = "")
+cat("=========================================================\n")
+cat(paste0("  - ", sort(archivos)), sep = "\n")
+
+cat("\n✅ Script 05 finalizado: ", length(archivos), " gráficas guardadas.\n", sep = "")
