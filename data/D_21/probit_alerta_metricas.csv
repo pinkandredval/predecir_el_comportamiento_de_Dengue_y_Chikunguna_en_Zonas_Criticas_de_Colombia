@@ -1,0 +1,2 @@
+modelo,auc,n_obs,n_regiones,n_alertas,prevalencia,aic,fuente_roc
+Probit alerta temprana,0.8267190569744597,564,12,55,0.0975177304964539,289.8838335887443,pROC
