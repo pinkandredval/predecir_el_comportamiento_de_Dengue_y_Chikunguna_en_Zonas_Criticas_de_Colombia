@@ -1,0 +1,5 @@
+prueba,causa,efecto,estadistico,gl1,gl2,p_valor
+Granger por ecuación (Wald F),M_dengue,ocupacion,1.4528747662957158,1,41,0.23497808234765952
+Granger por ecuación (Wald F),casos_dengue,M_dengue,0.01644369227328797,1,41,0.8985915586567854
+Granger sistema (vars::causality),M_dengue,casos_dengue + ocupacion,1.4619526218476566,2,123,0.23578221589133197
+Granger sistema (vars::causality),casos_dengue,M_dengue + ocupacion,0.015193836678370562,2,123,0.9849228555296147

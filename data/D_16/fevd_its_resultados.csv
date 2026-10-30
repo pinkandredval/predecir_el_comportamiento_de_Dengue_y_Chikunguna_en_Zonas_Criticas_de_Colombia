@@ -1,0 +1,9 @@
+bloque,respuesta,choque,horizonte,termino,estimacion,error_estandar,estadistico_t,p_valor,participacion_pct,nota
+FEVD,ocupacion,M_dengue,6,NA,NA,NA,NA,NA,2.3522654541271932,Fracción de la varianza de ocupación explicada por M_dengue
+FEVD,ocupacion,M_dengue,12,NA,NA,NA,NA,NA,2.3908765756068253,Fracción de la varianza de ocupación explicada por M_dengue
+ITS,ocupacion,NA,NA,(Intercept),124.44007737221297,14.6823096640762,8.475511021040887,1.226315252108985e-10,NA,ITS chikungunya 2025: Y ~ M_chik * dummy_2025 + lluvia + temp
+ITS,ocupacion,NA,NA,M_chik,-0.19373692882860608,0.1516038646253838,-1.2779155024005089,0.20829728285664662,NA,ITS chikungunya 2025: Y ~ M_chik * dummy_2025 + lluvia + temp
+ITS,ocupacion,NA,NA,dummy_2025,-3.035332882426173,0.9205627985994165,-3.297257815593089,0.0019926377601232445,NA,ITS chikungunya 2025: Y ~ M_chik * dummy_2025 + lluvia + temp
+ITS,ocupacion,NA,NA,lluvia,-0.004309973305540852,0.006038442402380775,-0.7137558029603065,0.47932600726209806,NA,ITS chikungunya 2025: Y ~ M_chik * dummy_2025 + lluvia + temp
+ITS,ocupacion,NA,NA,temp,-3.279044178437389,0.6458295073273412,-5.077259774034129,8.280956044198852e-6,NA,ITS chikungunya 2025: Y ~ M_chik * dummy_2025 + lluvia + temp
+ITS,ocupacion,NA,NA,M_chik:dummy_2025,0.42353451097312117,0.2367995647108972,1.7885780807502925,0.08089749364625991,NA,ITS chikungunya 2025: Y ~ M_chik * dummy_2025 + lluvia + temp
