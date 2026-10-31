@@ -1,0 +1,4 @@
+modelo,variables,rezagos,criterio_rezago,observaciones,n_trimestres,periodo,prueba,causa,efecto,estadistico,gl1,gl2,p_valor,raiz_maxima,significativo_5pct
+"VAR(casos_dengue, PD)","casos_dengue, PD",2,AIC (lag.max = 2),14,16,2022-T1 a 2025-T4,vars::causality (sistema),casos_dengue,PD,0.7793210763478466,2,18,0.47359186981252366,0.9328327434622642,FALSE
+"VAR(casos_dengue, PD)","casos_dengue, PD",2,AIC (lag.max = 2),14,16,2022-T1 a 2025-T4,Granger por ecuación (Wald F),casos_dengue,PD,0.7793210763478333,2,9,0.4873657120651042,0.9328327434622642,FALSE
+"VAR(casos_dengue, PD)","casos_dengue, PD",2,AIC (lag.max = 2),14,16,2022-T1 a 2025-T4,vars::causality (sistema),PD,casos_dengue,4.109927311912326,2,18,0.0338672576105683,0.9328327434622642,TRUE
